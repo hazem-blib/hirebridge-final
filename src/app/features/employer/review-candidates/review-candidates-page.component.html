@@ -289,38 +289,45 @@
                   <div class="boxy-actions-row">
                     <!-- Standard Actions (Hide if candidate rejected) -->
                     <ng-container *ngIf="applicant.companyDecision !== 'hired' && getInterviewForApplicant(applicant.id)?.candidateStatus !== 'rejected'">
-                      <!-- Accept Icon -->
-                      <button *ngIf="applicant.companyDecision !== 'rejected'" 
-                        class="action-trigger-boxy accept"
-                        [class.active]="applicant.companyDecision === 'accepted_for_interview'"
-                        (click)="acceptCandidate(applicant)"
-                        [disabled]="processingApplicantId === applicant.id || applicant.companyDecision === 'accepted_for_interview'"
-                        title="Accept Candidate">
-                        <i class="fas fa-check-circle"></i>
-                      </button>
-
-                      <!-- Schedule Icon (Only if accepted) -->
-                      <button *ngIf="applicant.companyDecision === 'accepted_for_interview'"
-                        class="action-trigger-boxy schedule"
-                        [class.highlight]="hasScheduledInterview(applicant.id)"
-                        (click)="scheduleInterview(applicant)"
-                        [disabled]="processingApplicantId === applicant.id"
-                        [title]="hasScheduledInterview(applicant.id) ? 'Reschedule Interview' : 'Schedule Interview'">
-                        <i class="fas" [ngClass]="hasScheduledInterview(applicant.id) ? 'fa-calendar-check' : 'fa-calendar-plus'"></i>
-                      </button>
-
-                      <!-- Reject Icon -->
-                      <button class="action-trigger-boxy reject" 
-                        (click)="rejectCandidate(applicant)"
-                        [disabled]="processingApplicantId === applicant.id"
-                        *ngIf="applicant.companyDecision !== 'accepted_for_interview' && applicant.companyDecision !== 'rejected'"
-                        title="Reject Candidate">
-                        <i class="fas fa-times-circle"></i>
-                      </button>
+                      @if (isJobFilled()) {
+                        <div class="hired-badge-boxy filled" title="Hiring limit reached">
+                          <i class="fas fa-lock"></i>
+                          <span>Filled</span>
+                        </div>
+                      } @else {
+                        <!-- Accept Icon -->
+                        <button *ngIf="applicant.companyDecision !== 'rejected'" 
+                          class="action-trigger-boxy accept"
+                          [class.active]="applicant.companyDecision === 'accepted_for_interview'"
+                          (click)="acceptCandidate(applicant)"
+                          [disabled]="processingApplicantId === applicant.id || applicant.companyDecision === 'accepted_for_interview'"
+                          title="Accept Candidate">
+                          <i class="fas fa-check-circle"></i>
+                        </button>
+  
+                        <!-- Schedule Icon (Only if accepted) -->
+                        <button *ngIf="applicant.companyDecision === 'accepted_for_interview'"
+                          class="action-trigger-boxy schedule"
+                          [class.highlight]="hasScheduledInterview(applicant.id)"
+                          (click)="scheduleInterview(applicant)"
+                          [disabled]="processingApplicantId === applicant.id"
+                          [title]="hasScheduledInterview(applicant.id) ? 'Reschedule Interview' : 'Schedule Interview'">
+                          <i class="fas" [ngClass]="hasScheduledInterview(applicant.id) ? 'fa-calendar-check' : 'fa-calendar-plus'"></i>
+                        </button>
+  
+                        <!-- Reject Icon -->
+                        <button class="action-trigger-boxy reject" 
+                          (click)="rejectCandidate(applicant)"
+                          [disabled]="processingApplicantId === applicant.id"
+                          *ngIf="applicant.companyDecision !== 'accepted_for_interview' && applicant.companyDecision !== 'rejected'"
+                          title="Reject Candidate">
+                          <i class="fas fa-times-circle"></i>
+                        </button>
+                      }
                     </ng-container>
 
-                    <!-- More Actions Group (Hide if candidate rejected) -->
-                    <div class="boxy-more-group" *ngIf="applicant.companyDecision !== 'hired' && applicant.companyDecision !== 'rejected' && getInterviewForApplicant(applicant.id)?.candidateStatus !== 'rejected'">
+                    <!-- More Actions Group (Hide if candidate rejected or job filled) -->
+                    <div class="boxy-more-group" *ngIf="!isJobFilled() && applicant.companyDecision !== 'hired' && applicant.companyDecision !== 'rejected' && getInterviewForApplicant(applicant.id)?.candidateStatus !== 'rejected'">
                       <button class="action-trigger-boxy hire" 
                         (click)="markHired(applicant)"
                         [disabled]="processingApplicantId === applicant.id" 

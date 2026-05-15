@@ -3,7 +3,7 @@ import { BehaviorSubject } from 'rxjs';
 
 export interface ToastMessage {
   id: number;
-  type: 'success' | 'error' | 'info';
+  type: 'success' | 'error' | 'info' | 'warning';
   text: string;
 }
 
@@ -40,6 +40,10 @@ export class ToastService {
 
   info(text: string, duration?: number): void {
     this.show('info', text, duration);
+  }
+
+  warning(text: string, duration?: number): void {
+    this.show('warning', text, duration);
   }
 
   dismiss(id: number): void {

@@ -193,7 +193,7 @@ export class EmployerReviewCandidatesPageComponent implements OnInit, OnDestroy 
           const bActive = b.status !== 'Filled';
           if (aActive && !bActive) return -1;
           if (!aActive && bActive) return 1;
-          
+
           // Secondary sort: Newest first
           const aDate = a.createdAt ? new Date(a.createdAt).getTime() : 0;
           const bDate = b.createdAt ? new Date(b.createdAt).getTime() : 0;
@@ -217,6 +217,18 @@ export class EmployerReviewCandidatesPageComponent implements OnInit, OnDestroy 
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe();
     this.setModalOpen(false);
+  }
+
+  isJobFilled(): boolean {
+    if (!this.job) return false;
+
+    // Check if status is explicitly Filled or Closed
+    if (this.job.status === 'Filled' || this.job.status === 'Closed') return true;
+
+    // Check if hired count exceeds open roles
+    const hiredCount = this.job.hiredCandidates?.length || this.job.hiredCount || 0;
+    const roles = this.job.openRoles || 1;
+    return hiredCount >= roles;
   }
 
   get currentJob(): EmployerJob {
@@ -401,6 +413,10 @@ export class EmployerReviewCandidatesPageComponent implements OnInit, OnDestroy 
   }
 
   markHired(applicant: EmployerApplicant): void {
+    if (this.isJobFilled()) {
+      this.toastService.warning('Hiring limit reached for this request.');
+      return;
+    }
     this.runApplicantAction(
       applicant.id,
       () => this.employerApplicationsService.updateCompanyDecision(applicant.id, 'hired', this.currentJob.id),

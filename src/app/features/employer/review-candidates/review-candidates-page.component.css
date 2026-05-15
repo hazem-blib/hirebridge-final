@@ -3544,3 +3544,15 @@
   background: linear-gradient(135deg, #0f1729 0%, rgba(91, 141, 239, 0.05) 100%);
   border-color: #243352;
 }
+
+.hired-badge-boxy.filled {
+  background: #f1f5f9;
+  color: #64748b;
+  border: 1px solid #e2e8f0;
+}
+
+:host-context(body.dark) .hired-badge-boxy.filled {
+  background: #1a2840;
+  color: #8b9ab8;
+  border-color: #243352;
+}

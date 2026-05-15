@@ -24,7 +24,7 @@ export interface EmployerJob {
   applicantsCount: number;
   hiredCount: number;
   openRoles: number;
-  status: 'Open' | 'Filled' | 'Cancelled' | 'Draft';
+  status: 'Open' | 'Filled' | 'Cancelled' | 'Draft' | 'Closed';
   shortlistedCandidates?: any[];
   acceptedCandidates?: any[];
   rejectedCandidates?: any[];

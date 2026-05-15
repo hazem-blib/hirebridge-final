@@ -67,7 +67,7 @@ export class EmployerInterviewsComponent implements OnInit {
       const aIsClosed = a.status === 'Filled';
       const bIsClosed = b.status === 'Filled';
       if (aIsClosed !== bIsClosed) return aIsClosed ? 1 : -1;
-      
+
       // Priority 2: Newest first
       const aDate = a.createdAt ? new Date(a.createdAt).getTime() : 0;
       const bDate = b.createdAt ? new Date(b.createdAt).getTime() : 0;
@@ -76,9 +76,9 @@ export class EmployerInterviewsComponent implements OnInit {
   }
 
   get isRejected(): boolean {
-    return this.selectedInterview?.outcome === 'failed' || 
-           this.selectedInterview?.outcome === 'hold' ||
-           this.selectedInterview?.candidateStatus === 'rejected';
+    return this.selectedInterview?.outcome === 'failed' ||
+      this.selectedInterview?.outcome === 'hold' ||
+      this.selectedInterview?.candidateStatus === 'rejected';
   }
 
   get isHired(): boolean {
@@ -92,6 +92,24 @@ export class EmployerInterviewsComponent implements OnInit {
     return interview.candidateStatus === 'accepted';
   }
 
+
+  isJobFilled(jobId: string | number | null): boolean {
+    if (!jobId) return false;
+    const job = this.allJobs.find(j => String(j.id) === String(jobId));
+    if (!job) return false;
+
+    // Priority check: Status field
+    if (job.status === 'Filled' || job.status === 'Closed') return true;
+
+    // Manual count check
+    const hiredCount = job.hiredCandidates?.length || job.hiredCount || 0;
+    const roles = job.openRoles || 1;
+    return hiredCount >= roles;
+  }
+
+  get isCurrentJobFilled(): boolean {
+    return this.isJobFilled(this.jobId);
+  }
 
   get filteredInterviews(): ScheduledInterview[] {
     const search = this.searchTerm.trim().toLowerCase();
@@ -225,7 +243,8 @@ export class EmployerInterviewsComponent implements OnInit {
   getOutcomeLabel(interview: ScheduledInterview): string {
     if (interview.candidateStatus === 'rejected') return 'Cancelled';
     if (interview.probationStarted) return 'Hired';
-    
+    if (!this.canTakeDecision(interview)) return 'Pending Approval';
+
     const value = interview.outcome || 'pending';
     const labels: Record<InterviewOutcome, string> = {
       pending: 'Pending decision',
@@ -240,7 +259,8 @@ export class EmployerInterviewsComponent implements OnInit {
   getOutcomeBadgeClass(interview: ScheduledInterview): string {
     if (interview.candidateStatus === 'rejected') return 'status-badge cancelled';
     if (interview.probationStarted) return 'status-badge completed hired';
-    
+    if (!this.canTakeDecision(interview)) return 'status-badge rescheduled';
+
     const value = interview.outcome || 'pending';
     const classes: Record<InterviewOutcome, string> = {
       pending: 'status-badge rescheduled',

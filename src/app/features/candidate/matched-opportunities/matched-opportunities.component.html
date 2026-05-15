@@ -41,11 +41,9 @@
   <!-- ─── Opportunities Grid ─── -->
   <div class="opportunities-grid fade-in-up" *ngIf="!isLoading && matchedJobs.length > 0">
     <article class="compact-opp-card" *ngFor="let job of matchedJobs; let i = index"
-      [style.animation-delay]="(i * 0.1) + 's'" 
-      [class.is-hired]="job.status === 'Hired'"
-      [class.is-rejected]="job.status === 'Rejected'"
-      (click)="viewJobDetails(job)">
-      
+      [style.animation-delay]="(i * 0.1) + 's'" [class.is-hired]="job.status === 'Hired'"
+      [class.is-rejected]="job.status === 'Rejected'" (click)="viewJobDetails(job)">
+
       <!-- Special State Overlays -->
       <div class="state-status-indicator" *ngIf="job.status === 'Hired' || job.status === 'Rejected'">
         <span class="indicator-pill" [ngClass]="job.status.toLowerCase()">
@@ -59,7 +57,8 @@
         <div class="brand-row">
           <div class="brand-left">
             <div class="brand-logo-small">
-              <img *ngIf="job.companyLogo" [src]="job.companyLogo" [alt]="job.companyName" (error)="job.companyLogo = ''">
+              <img *ngIf="job.companyLogo" [src]="job.companyLogo" [alt]="job.companyName"
+                (error)="job.companyLogo = ''">
               <div *ngIf="!job.companyLogo" class="logo-init">{{ job.companyName.charAt(0) }}</div>
             </div>
             <div class="brand-text">
@@ -67,7 +66,7 @@
               <span class="comp-name">{{ job.companyName }}</span>
             </div>
           </div>
-          
+
           <div class="match-score-pill" [class.high]="job.matchScore >= 90">
             <span class="score-val">{{ job.matchScore }}%</span>
             <span class="score-lab">Fit</span>
@@ -76,16 +75,16 @@
 
         <!-- Hired/Rejected Context Messages -->
         <div class="context-banner" *ngIf="job.status === 'Hired'">
-           <div class="banner-icon">🎊</div>
-           <div class="banner-text">
-              <strong>Congratulations!</strong> You are hired.
-           </div>
+          <div class="banner-icon">🎊</div>
+          <div class="banner-text">
+            <strong>Congratulations!</strong> You are hired.
+          </div>
         </div>
         <div class="context-banner rejected" *ngIf="job.status === 'Rejected'">
-           <div class="banner-icon">💪</div>
-           <div class="banner-text">
-              <strong>Keep Going!</strong> Better things are coming your way.
-           </div>
+          <div class="banner-icon">💪</div>
+          <div class="banner-text">
+            <strong>Keep Going!</strong> Better things are coming your way.
+          </div>
         </div>
 
         <!-- Details Grid -->
@@ -96,7 +95,8 @@
         </div>
 
         <!-- Interview Section (Only if scheduled and pending) -->
-        <div class="compact-interview-box" *ngIf="job.status === 'Interview Scheduled' && (!job.interviewCandidateStatus || job.interviewCandidateStatus === 'pending')">
+        <div class="compact-interview-box"
+          *ngIf="job.status === 'Interview Scheduled' && (!job.interviewCandidateStatus || job.interviewCandidateStatus === 'pending')">
           <div class="iv-header">
             <span class="iv-pulse"></span>
             INTERVIEW INVITE
@@ -106,27 +106,31 @@
               <i class="far fa-calendar-alt"></i> {{ job.interviewDate | date:'MMM d' }} • {{ job.interviewTime }}
             </div>
             <div class="iv-actions">
-              <button class="iv-btn accept" (click)="respondToInterview(job, 'accepted'); $event.stopPropagation()">Accept</button>
-              <button class="iv-btn decline" (click)="respondToInterview(job, 'rejected'); $event.stopPropagation()">Decline</button>
+              <button class="iv-btn accept"
+                (click)="respondToInterview(job, 'accepted'); $event.stopPropagation()">Accept</button>
+              <button class="iv-btn decline"
+                (click)="respondToInterview(job, 'rejected'); $event.stopPropagation()">Decline</button>
             </div>
           </div>
         </div>
 
         <!-- Actions Row -->
         <div class="actions-row-compact">
-           <div class="status-wrap">
-              <span class="compact-status-badge" [ngClass]="getStatusClass(job.status)" *ngIf="job.status !== 'Hired' && job.status !== 'Rejected'">
-                 <ng-container [ngSwitch]="job.interviewCandidateStatus">
-                    <span *ngSwitchCase="'accepted'">Interview Confirmed</span>
-                    <span *ngSwitchCase="'rejected'" style="color: #ef4444;">Interview Cancelled</span>
-                    <span *ngSwitchDefault>{{ job.status }}</span>
-                 </ng-container>
-              </span>
-              <span class="joined-date" *ngIf="job.status === 'Hired'">Joined {{ (job.interviewDate || 'recently') | date:'MMM yyyy' }}</span>
-           </div>
-           <button class="btn-view-details" (click)="viewJobDetails(job); $event.stopPropagation()">
-              Details <i class="fas fa-arrow-right"></i>
-           </button>
+          <div class="status-wrap">
+            <span class="compact-status-badge" [ngClass]="getStatusClass(job.status)"
+              *ngIf="job.status !== 'Hired' && job.status !== 'Rejected'">
+              <ng-container [ngSwitch]="job.interviewCandidateStatus">
+                <span *ngSwitchCase="'accepted'">Interview Confirmed</span>
+                <span *ngSwitchCase="'rejected'" style="color: #ef4444;">Interview Cancelled</span>
+                <span *ngSwitchDefault>{{ job.status }}</span>
+              </ng-container>
+            </span>
+            <span class="joined-date" *ngIf="job.status === 'Hired'">Joined {{ (job.interviewDate || 'recently') |
+              date:'MMM yyyy' }}</span>
+          </div>
+          <button class="btn-view-details" (click)="viewJobDetails(job); $event.stopPropagation()">
+            Details <i class="fas fa-arrow-right"></i>
+          </button>
         </div>
       </div>
     </article>

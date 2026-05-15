@@ -256,16 +256,22 @@
                     <i class="fas fa-circle-info"></i>
                   </button>
                   <ng-container *ngIf="item.candidateStatus !== 'rejected' && !item.probationStarted">
-                    <button class="hub-btn success" (click)="setInterviewOutcome(item, 'passed')"
-                      *ngIf="item.status !== 'completed' || item.outcome === 'pending'"
-                      [disabled]="!canTakeDecision(item)"
-                      [title]="canTakeDecision(item) ? 'Mark Passed' : 'Waiting for candidate to accept interview'">
-                      <i class="fas fa-user-check"></i>
-                    </button>
-                    <button class="hub-btn danger" (click)="cancelInterview(item.id)"
-                      [disabled]="item.status === 'cancelled' || item.status === 'completed'">
-                      <i class="fas fa-ban"></i>
-                    </button>
+                    @if (isJobFilled(item.jobId)) {
+                      <div class="filled-indicator" title="Job has reached its hiring capacity">
+                        <i class="fas fa-lock"></i>
+                        <span>Filled</span>
+                      </div>
+                    } @else if (canTakeDecision(item)) {
+                      <button class="hub-btn success" (click)="setInterviewOutcome(item, 'passed')"
+                        *ngIf="item.status !== 'completed' || item.outcome === 'pending'"
+                        title="Mark Passed">
+                        <i class="fas fa-user-check"></i>
+                      </button>
+                      <button class="hub-btn danger" (click)="cancelInterview(item.id)"
+                        [disabled]="item.status === 'cancelled' || item.status === 'completed'">
+                        <i class="fas fa-ban"></i>
+                      </button>
+                    }
                   </ng-container>
                   <div class="status-icon-mini hired" *ngIf="item.probationStarted" title="Candidate Hired">
                     <i class="fas fa-award"></i>
@@ -466,23 +472,32 @@
         </button>
 
         <div class="modal-decision-actions" *ngIf="!isRejected && selectedInterview.candidateStatus !== 'rejected'; else rejectedState">
-          <button class="btn-premium secondary danger-text" *ngIf="!isHired && selectedInterview.outcome !== 'passed'"
-            [disabled]="!canTakeDecision(selectedInterview)"
-            (click)="setInterviewOutcome(selectedInterview, 'failed')">
-            <i class="fas fa-user-times"></i> Reject
-          </button>
-  
-          <button class="btn-premium success-bg" *ngIf="selectedInterview.outcome !== 'passed'"
-            [disabled]="!canTakeDecision(selectedInterview)"
-            (click)="setInterviewOutcome(selectedInterview, 'passed')">
-            <i class="fas fa-check"></i> Mark Passed
-          </button>
-  
-          <button class="btn-premium success-bg" *ngIf="selectedInterview.outcome === 'passed' && !isHired"
-            [disabled]="!canTakeDecision(selectedInterview)"
-            (click)="confirmHire(selectedInterview)">
-            <i class="fas fa-award"></i> Confirm Final Hire
-          </button>
+          @if (isJobFilled(selectedInterview.jobId) && !isHired) {
+            <div class="final-status-text neutral">
+              <i class="fas fa-circle-check"></i> 
+              Hiring request completed (Filled)
+            </div>
+          } @else if (canTakeDecision(selectedInterview)) {
+            <button class="btn-premium secondary danger-text" *ngIf="!isHired && selectedInterview.outcome !== 'passed'"
+              (click)="setInterviewOutcome(selectedInterview, 'failed')">
+              <i class="fas fa-user-times"></i> Reject
+            </button>
+    
+            <button class="btn-premium success-bg" *ngIf="selectedInterview.outcome !== 'passed'"
+              (click)="setInterviewOutcome(selectedInterview, 'passed')">
+              <i class="fas fa-check"></i> Mark Passed
+            </button>
+    
+            <button class="btn-premium success-bg" *ngIf="selectedInterview.outcome === 'passed' && !isHired"
+              (click)="confirmHire(selectedInterview)">
+              <i class="fas fa-award"></i> Confirm Final Hire
+            </button>
+          } @else {
+            <div class="final-status-text warning-light">
+              <i class="fas fa-clock fa-spin-slow"></i>
+              Waiting for candidate's approval...
+            </div>
+          }
 
           <button class="btn-premium success-bg" *ngIf="isHired" disabled style="opacity: 0.8; cursor: default;">
             <i class="fas fa-check-circle"></i> Already Hired

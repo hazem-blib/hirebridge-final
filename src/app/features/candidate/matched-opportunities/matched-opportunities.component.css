@@ -139,12 +139,12 @@ body.dark .intel-icon-box.green {
   transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   overflow: hidden;
   cursor: pointer;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
 }
 
 .compact-opp-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 12px 24px rgba(0,0,0,0.06);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.06);
   border-color: #3b82f6;
 }
 
@@ -285,7 +285,9 @@ body.dark .intel-icon-box.green {
   border-color: #fee2e2;
 }
 
-.banner-icon { font-size: 1.2rem; }
+.banner-icon {
+  font-size: 1.2rem;
+}
 
 .banner-text {
   font-size: 0.85rem;
@@ -327,9 +329,20 @@ body.dark .intel-icon-box.green {
 }
 
 @keyframes iv-pulse-key {
-  0% { transform: scale(0.95); opacity: 1; }
-  50% { transform: scale(1.2); opacity: 0.5; }
-  100% { transform: scale(0.95); opacity: 1; }
+  0% {
+    transform: scale(0.95);
+    opacity: 1;
+  }
+
+  50% {
+    transform: scale(1.2);
+    opacity: 0.5;
+  }
+
+  100% {
+    transform: scale(0.95);
+    opacity: 1;
+  }
 }
 
 .iv-content {
@@ -364,11 +377,25 @@ body.dark .intel-icon-box.green {
   transition: all 0.2s ease;
 }
 
-.iv-btn.accept { background: #3b82f6; color: white; }
-.iv-btn.accept:hover { background: #2563eb; transform: translateY(-1px); }
+.iv-btn.accept {
+  background: #3b82f6;
+  color: white;
+}
 
-.iv-btn.decline { background: white; color: #ef4444; border: 1px solid #fee2e2; }
-.iv-btn.decline:hover { background: #fef2f2; }
+.iv-btn.accept:hover {
+  background: #2563eb;
+  transform: translateY(-1px);
+}
+
+.iv-btn.decline {
+  background: white;
+  color: #ef4444;
+  border: 1px solid #fee2e2;
+}
+
+.iv-btn.decline:hover {
+  background: #fef2f2;
+}
 
 /* ─── Actions Row ─── */
 .actions-row-compact {
@@ -389,8 +416,15 @@ body.dark .intel-icon-box.green {
   text-transform: uppercase;
 }
 
-.compact-status-badge.matched { background: #f0f9ff; color: #0369a1; }
-.compact-status-badge.interview-scheduled { background: #eff6ff; color: #1d4ed8; }
+.compact-status-badge.matched {
+  background: #f0f9ff;
+  color: #0369a1;
+}
+
+.compact-status-badge.interview-scheduled {
+  background: #eff6ff;
+  color: #1d4ed8;
+}
 
 .joined-date {
   font-size: 0.75rem;
@@ -447,8 +481,15 @@ body.dark .intel-icon-box.green {
   letter-spacing: 0.05em;
 }
 
-.indicator-pill.hired { background: #10b981; color: white; }
-.indicator-pill.rejected { background: #ef4444; color: white; }
+.indicator-pill.hired {
+  background: #10b981;
+  color: white;
+}
+
+.indicator-pill.rejected {
+  background: #ef4444;
+  color: white;
+}
 
 /* ─── Animations ─── */
 .fade-in-up {
@@ -456,8 +497,15 @@ body.dark .intel-icon-box.green {
 }
 
 @keyframes fadeInUpKey {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 body.dark .compact-opp-card {
@@ -465,9 +513,18 @@ body.dark .compact-opp-card {
   border-color: #334155;
 }
 
-body.dark .job-name { color: #f8fafc; }
-body.dark .meta-item { background: #0f172a; color: #94a3b8; }
-body.dark .btn-view-details { background: #3b82f6; }
+body.dark .job-name {
+  color: #f8fafc;
+}
+
+body.dark .meta-item {
+  background: #0f172a;
+  color: #94a3b8;
+}
+
+body.dark .btn-view-details {
+  background: #3b82f6;
+}
 
 .btn-premium-details:hover {
   background: #1e293b;
