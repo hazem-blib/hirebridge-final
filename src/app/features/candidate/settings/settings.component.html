@@ -1,0 +1,96 @@
+<section class="candidate-page">
+  <article class="cb-hero fade-in-up">
+    <div class="hero-content">
+      <p class="cb-eyebrow">Account Settings</p>
+      <h1>Manage your <span class="text-gradient">Session & Security</span></h1>
+      <p>Review your account credentials and control your active session across all devices.</p>
+    </div>
+
+    <aside class="exec-visual security-box">
+      <div class="security-status">
+        <i class="fas fa-shield-alt"></i>
+        <span>Account Protected</span>
+      </div>
+    </aside>
+  </article>
+
+  <section class="cb-kpis fade-in-up delay-1">
+    <article class="cb-kpi">
+      <div class="kpi-icon blue"><i class="fas fa-envelope"></i></div>
+      <div class="kpi-data">
+        <h3>{{ user?.email || 'N/A' }}</h3>
+        <p>Email Address</p>
+        <small>Primary credentials</small>
+      </div>
+    </article>
+
+    <article class="cb-kpi">
+      <div class="kpi-icon green"><i class="fas fa-user-shield"></i></div>
+      <div class="kpi-data">
+        <h3>{{ user?.role || 'Candidate' }}</h3>
+        <p>Current Role</p>
+        <small>Permissions Level</small>
+      </div>
+    </article>
+
+    <article class="cb-kpi">
+      <div class="kpi-icon amber"><i class="fas fa-key"></i></div>
+      <div class="kpi-data">
+        <h3>Active</h3>
+        <p>Token Status</p>
+        <small>Session Integrity</small>
+      </div>
+    </article>
+
+    <article class="cb-kpi clickable-card" (click)="logout()">
+      <div class="kpi-icon red"><i class="fas fa-power-off"></i></div>
+      <div class="kpi-data">
+        <h3>Sign Out</h3>
+        <p>Security</p>
+        <small>Close Session</small>
+      </div>
+    </article>
+  </section>
+
+  <div class="settings-grid-layout fade-in-up delay-2">
+    <article class="cb-panel">
+      <header class="cb-panel-head">
+        <div>
+          <p class="cb-eyebrow">Termination</p>
+          <h3>Session Control</h3>
+        </div>
+      </header>
+      
+      <div class="settings-action-panel">
+        <div class="action-info">
+          <strong>Logout of HireBridge</strong>
+          <p>Ending your session will require you to log back in next time you visit the platform.</p>
+        </div>
+        <button type="button" class="cb-btn cb-btn-danger btn-logout-large" (click)="logout()">
+          <i class="fas fa-sign-out-alt"></i>
+          Terminate Session
+        </button>
+      </div>
+    </article>
+  
+    <article class="cb-panel employer-settings-links" *ngIf="isEmployerSettings">
+      <header class="cb-panel-head">
+        <div>
+          <p class="cb-eyebrow">Employer</p>
+          <h3>Company Profile</h3>
+        </div>
+      </header>
+  
+      <div class="settings-action-panel brand-panel">
+        <div class="action-info">
+          <strong>Brand Identity</strong>
+          <p>Update your company logo, industry details, and professional contact information.</p>
+        </div>
+        <a routerLink="/employer/company-profile" class="cb-btn cb-btn-primary btn-brand-large">
+          <i class="fas fa-building"></i>
+          Manage Profile
+        </a>
+      </div>
+    </article>
+  </div>
+</section>

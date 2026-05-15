@@ -1,0 +1,282 @@
+:host {
+  display: block;
+}
+
+.employer-bottom-nav,
+.employer-mobile-fab {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  :host ::ng-deep .layout.employer-shell {
+    display: block !important;
+    min-height: 100vh;
+    background: #f8fafc;
+    overscroll-behavior-y: auto;
+  }
+
+  :host-context(body.dark) :host ::ng-deep .layout.employer-shell {
+    background: #0f172a !important;
+  }
+
+  :host ::ng-deep .layout.employer-shell .sidebar,
+  :host ::ng-deep .layout.employer-shell .sidebar.collapsed,
+  :host ::ng-deep .layout.employer-shell .sidebar:not(.collapsed) {
+    position: fixed !important;
+    left: -100% !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    width: 280px !important;
+    height: 100vh !important;
+    z-index: 1000;
+  }
+
+  :host ::ng-deep .layout.employer-shell .main,
+  :host ::ng-deep .layout.employer-shell .content {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+  }
+
+  :host ::ng-deep .layout.employer-shell .main {
+    display: block !important;
+  }
+
+  :host ::ng-deep .layout.employer-shell .content {
+    padding: 12px 12px 112px !important;
+    min-height: calc(100vh - 60px);
+    animation: employerPageIn 0.32s ease-out both;
+  }
+
+  body.modal-open :host ::ng-deep .layout.employer-shell .content {
+    animation: none !important;
+    transform: none !important;
+  }
+
+  :host ::ng-deep .layout.employer-shell .topbar {
+    height: 64px !important;
+    min-height: 64px !important;
+    padding: 0 16px !important;
+    position: sticky !important;
+    top: 0;
+    z-index: 100;
+    border-radius: 0;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    background: rgba(255, 255, 255, 0.8) !important;
+    backdrop-filter: blur(16px) saturate(180%);
+    border-bottom: 1px solid rgba(226, 232, 240, 0.8) !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+  }
+
+  :host ::ng-deep .layout.employer-shell .topbar::before {
+    content: 'HB';
+    position: absolute;
+    left: 16px;
+    width: 36px;
+    height: 36px;
+    background: #0f172a;
+    border-radius: 12px;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 0.9rem;
+    box-shadow: 0 8px 16px rgba(15, 23, 42, 0.15);
+  }
+
+  :host ::ng-deep .layout.employer-shell .topbar-search,
+  :host ::ng-deep .layout.employer-shell .user-info {
+    display: none !important;
+  }
+
+  :host ::ng-deep .layout.employer-shell .topbar-left {
+    width: auto !important;
+    flex: 0 0 auto !important;
+    margin-left: 48px !important;
+    /* Space for HB logo */
+    display: flex !important;
+    align-items: center !important;
+  }
+
+  :host ::ng-deep .layout.employer-shell .menu-toggle {
+    display: none !important;
+  }
+
+  :host ::ng-deep .layout.employer-shell .topbar-actions {
+    width: auto !important;
+    flex: 1 !important;
+    justify-content: flex-end !important;
+    gap: 8px !important;
+    display: flex !important;
+  }
+
+  :host ::ng-deep .layout.employer-shell .topbar-actions button[aria-label="Help"] {
+    display: none !important;
+  }
+
+  :host ::ng-deep .layout.employer-shell .user-menu {
+    position: relative !important;
+  }
+
+  :host ::ng-deep .layout.employer-shell .user-menu .dropdown {
+    right: 0 !important;
+    left: auto !important;
+    transform: none !important;
+    top: calc(100% + 10px) !important;
+  }
+
+  :host ::ng-deep .layout.employer-shell .topbar-actions .icon-btn {
+    width: 36px !important;
+    height: 36px !important;
+    border-radius: 10px !important;
+    background: #f8fafc !important;
+    color: #475569 !important;
+    transition: all 0.2s ease !important;
+    border: 1px solid #e2e8f0 !important;
+  }
+
+  :host-context(body.dark) :host ::ng-deep .layout.employer-shell .topbar-actions .icon-btn {
+    background: #1e293b !important;
+    color: #94a3b8 !important;
+    border-color: #334155 !important;
+  }
+
+  :host ::ng-deep .layout.employer-shell .topbar-actions .icon-btn:hover {
+    background: #f1f5f9 !important;
+    color: #1e293b !important;
+  }
+
+  :host ::ng-deep .layout.employer-shell .topbar-actions .avatar-wrapper {
+    width: 36px !important;
+    height: 36px !important;
+    border-radius: 10px !important;
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+  }
+
+  .employer-bottom-nav {
+    position: fixed;
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+    z-index: 80;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4px;
+    padding: 8px;
+    border: 1px solid rgba(226, 232, 240, 0.9);
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.94);
+    box-shadow: 0 18px 45px rgba(15, 23, 42, 0.14);
+    backdrop-filter: blur(18px);
+  }
+
+  .employer-bottom-nav a {
+    min-width: 0;
+    height: 50px;
+    border-radius: 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    color: #64748b;
+    text-decoration: none;
+    font-size: 0.68rem;
+    font-weight: 800;
+    transition: transform 0.16s ease, background 0.16s ease, color 0.16s ease;
+  }
+
+  .employer-bottom-nav a i {
+    font-size: 1rem;
+  }
+
+  .employer-bottom-nav a.active {
+    background: rgba(37, 99, 235, 0.05);
+    color: #2563eb;
+    position: relative;
+  }
+
+  .employer-bottom-nav a.active::after {
+    content: '';
+    position: absolute;
+    top: 4px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 4px;
+    height: 4px;
+    background: #2563eb;
+    border-radius: 50%;
+    box-shadow: 0 0 8px rgba(37, 99, 235, 0.5);
+  }
+
+  .employer-bottom-nav a:active,
+  .employer-mobile-fab:active {
+    transform: scale(0.95);
+  }
+
+  .employer-mobile-fab {
+    position: fixed;
+    right: 20px;
+    bottom: 84px;
+    z-index: 85;
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #000000;
+    /* Black as requested */
+    color: #ffffff;
+    text-decoration: none;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Dark Mode Enhancements */
+  :host-context(body.dark) .employer-bottom-nav {
+    background: rgba(15, 23, 42, 0.94) !important;
+    border-color: rgba(59, 130, 246, 0.2) !important;
+    box-shadow: 0 18px 45px rgba(0, 0, 0, 0.4) !important;
+  }
+
+  :host-context(body.dark) .employer-bottom-nav a {
+    color: #94a3b8 !important;
+  }
+
+  :host-context(body.dark) .employer-bottom-nav a.active {
+    background: rgba(37, 99, 235, 0.1) !important;
+    color: #60a5fa !important;
+  }
+
+  :host-context(body.dark) .employer-bottom-nav a.active::after {
+    background: #60a5fa !important;
+    box-shadow: 0 0 10px rgba(96, 165, 250, 0.6) !important;
+  }
+
+  :host-context(body.dark) :host ::ng-deep .layout.employer-shell .topbar {
+    background: rgba(15, 23, 42, 0.85) !important;
+    border-bottom-color: rgba(59, 130, 246, 0.1) !important;
+  }
+
+  :host-context(body.dark) .employer-mobile-fab {
+    background: #2563eb !important;
+    box-shadow: 0 12px 28px rgba(37, 99, 235, 0.3) !important;
+  }
+}
+
+
+@keyframes employerPageIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

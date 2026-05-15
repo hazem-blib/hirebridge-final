@@ -1,0 +1,257 @@
+<div class="employer-dashboard">
+  <!-- Breadcrumbs & Header -->
+  <header class="exec-hero fade-in-up">
+    <div class="exec-copy">
+      <div class="breadcrumb-premium">
+        <a routerLink="/employer/jobs">Hiring Requests</a>
+        <i class="fas fa-chevron-right"></i>
+        <span>Submit Brief</span>
+      </div>
+      <h1>Create <span class="text-gradient">Hiring Request</span></h1>
+      <p>Submit your role requirements. Our system will immediately start matching top-tier talent for your review.</p>
+    </div>
+    
+    <div class="exec-visual">
+       <div class="completion-orb-container">
+          <div class="completion-orb">
+             <svg viewBox="0 0 36 36" class="circular-chart blue">
+                <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                <path class="circle" [style.stroke-dasharray]="(((form.title ? 1 : 0) + (form.category ? 1 : 0) + (form.description ? 1 : 0) + (form.workType ? 1 : 0) + (form.budget.min ? 1 : 0) + (form.budget.max ? 1 : 0) + (form.minExperience ? 1 : 0) + (form.experienceLevel ? 1 : 0) + (form.headcount ? 1 : 0) + (form.skillsRequired.length ? 1 : 0)) * 10) + ', 100'" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                <text x="18" y="20.35" class="percentage">{{ ((form.title ? 1 : 0) + (form.category ? 1 : 0) + (form.description ? 1 : 0) + (form.workType ? 1 : 0) + (form.budget.min ? 1 : 0) + (form.budget.max ? 1 : 0) + (form.minExperience ? 1 : 0) + (form.experienceLevel ? 1 : 0) + (form.headcount ? 1 : 0) + (form.skillsRequired.length ? 1 : 0)) * 10 }}%</text>
+             </svg>
+          </div>
+          <div class="health-label">
+             <strong>Brief Strength</strong>
+             <small>Completion progress</small>
+          </div>
+       </div>
+    </div>
+  </header>
+
+  <div class="executive-error-alert" *ngIf="error">
+    <i class="fas fa-exclamation-triangle"></i>
+    <p>{{ error }}</p>
+  </div>
+
+  <div class="premium-grid-layout fade-in-up delay-1">
+    <form class="form-main-area" (ngSubmit)="submit()">
+      <!-- Basic Info -->
+      <section class="glass-panel">
+        <header class="panel-header">
+          <div class="panel-title-row">
+            <div class="panel-icon bolt"><i class="fas fa-bolt"></i></div>
+            <h3>Basic Role Information</h3>
+          </div>
+        </header>
+        
+        <div class="form-grid-premium">
+          <!-- Row 1 -->
+          <div class="field-premium col-6">
+            <label>Job Title</label>
+            <div class="input-wrap">
+              <i class="fas fa-briefcase"></i>
+              <input type="text" [(ngModel)]="form.title" name="title" placeholder="e.g. Senior Full Stack Engineer" />
+            </div>
+          </div>
+
+          <!-- Row 2 -->
+          <div class="field-premium col-3">
+            <label>Department</label>
+            <div class="custom-select-premium" [class.active]="openDropdown === 'category'" (click)="toggleDropdown('category', $event)">
+              <div class="selected-value">
+                <i [class]="getDepartmentIcon(form.category)"></i>
+                <span>{{ form.category || 'Select Department' }}</span>
+                <i class="fas fa-chevron-down arrow"></i>
+              </div>
+              <div class="dropdown-options-premium">
+                <div class="option-item" *ngFor="let dep of departments" 
+                     [class.selected]="form.category === dep"
+                     (click)="$event.stopPropagation(); selectOption('category', dep)">
+                  <i [class]="getDepartmentIcon(dep)"></i>
+                  {{ dep }}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="field-premium col-3">
+            <label>Work Type</label>
+            <div class="custom-select-premium" [class.active]="openDropdown === 'workType'" (click)="toggleDropdown('workType', $event)">
+              <div class="selected-value">
+                <i [class]="getWorkTypeIcon(form.workType)"></i>
+                <span>{{ formatEnum(form.workType) || 'Select Work Type' }}</span>
+                <i class="fas fa-chevron-down arrow"></i>
+              </div>
+              <div class="dropdown-options-premium">
+                <div class="option-item" *ngFor="let type of workTypes" 
+                     [class.selected]="form.workType === type"
+                     (click)="$event.stopPropagation(); selectOption('workType', type)">
+                  <i [class]="getWorkTypeIcon(type)"></i>
+                  {{ formatEnum(type) }}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Row 3 -->
+          <div class="field-premium col-3">
+            <label>Experience Level</label>
+            <div class="custom-select-premium" [class.active]="openDropdown === 'experienceLevel'" (click)="toggleDropdown('experienceLevel', $event)">
+              <div class="selected-value">
+                <i [class]="getExperienceIcon(form.experienceLevel)"></i>
+                <span>{{ form.experienceLevel || 'Select Experience' }}</span>
+                <i class="fas fa-chevron-down arrow"></i>
+              </div>
+              <div class="dropdown-options-premium">
+                <div class="option-item" *ngFor="let level of experienceLevels" 
+                     [class.selected]="form.experienceLevel === level"
+                     (click)="$event.stopPropagation(); selectOption('experienceLevel', level)">
+                  <i [class]="getExperienceIcon(level)"></i>
+                  {{ level }}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="field-premium col-3">
+            <label>Years of Experience</label>
+            <div class="input-wrap">
+              <i class="fas fa-history"></i>
+              <input type="number" [(ngModel)]="form.minExperience" name="minExperience" min="0" placeholder="e.g. 3" />
+            </div>
+          </div>
+
+          <!-- Row 4 -->
+          <div class="field-premium col-4">
+            <label>Budget Range (EGP)</label>
+            <div class="range-inputs">
+              <div class="input-wrap" style="flex: 1;">
+                <i class="fas fa-money-bill-wave"></i>
+                <input type="number" [(ngModel)]="form.budget.min" name="budgetMin" placeholder="Min" />
+              </div>
+              <span>to</span>
+              <div class="input-wrap" style="flex: 1;">
+                <i class="fas fa-money-bill-wave"></i>
+                <input type="number" [(ngModel)]="form.budget.max" name="budgetMax" placeholder="Max" />
+              </div>
+            </div>
+          </div>
+
+          <div class="field-premium col-2">
+            <label>Headcount</label>
+            <div class="input-wrap">
+              <i class="fas fa-users"></i>
+              <input type="number" [(ngModel)]="form.headcount" name="headcount" min="1" placeholder="e.g. 1" />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Description -->
+      <section class="glass-panel">
+        <header class="panel-header">
+          <h3>Role Briefing</h3>
+          <span class="hint">Outline responsibilities & expectations</span>
+        </header>
+        <textarea class="premium-textarea" [(ngModel)]="form.description" name="description" rows="8" placeholder="Enter detailed job description..."></textarea>
+      </section>
+
+      <!-- Skills -->
+      <section class="glass-panel">
+        <header class="panel-header">
+          <h3>Required Capabilities</h3>
+        </header>
+        <div class="skills-input-row-premium">
+          <input type="text" [(ngModel)]="skillInput" name="skillInput" placeholder="Add a skill..." (keydown.enter)="addSkill(); $event.preventDefault()" />
+          <button type="button" class="btn-add-skill-premium" (click)="addSkill()"><i class="fas fa-plus"></i></button>
+        </div>
+        <div class="skills-tags-premium" *ngIf="form.skillsRequired.length">
+          <span class="skill-pill-premium" *ngFor="let skill of form.skillsRequired">
+            {{ skill }}
+            <i class="fas fa-times" (click)="removeSkill(skill)"></i>
+          </span>
+        </div>
+      </section>
+
+      <div class="form-actions-premium">
+        <a routerLink="/employer/jobs" class="btn-link-premium">Cancel</a>
+        <button type="submit" class="btn-premium primary lg" [disabled]="saving" [class.btn-shimmer]="!saving">
+          <span *ngIf="!saving">Launch Hiring Request <i class="fas fa-arrow-right"></i></span>
+          <span *ngIf="saving" class="loading-content">
+            <i class="fas fa-circle-notch fa-spin"></i>
+            Submitting...
+          </span>
+        </button>
+      </div>
+    </form>
+
+    <aside class="form-sidebar-area">
+      <div class="glass-panel summary-sticky">
+        <header class="panel-header">
+          <h3>Live Summary</h3>
+        </header>
+        <div class="sidebar-stats-list">
+          <div class="sidebar-stat">
+            <i class="fas fa-briefcase"></i>
+            <div class="stat-info">
+              <span>Role</span>
+              <strong>{{ form.title || 'Untitled' }}</strong>
+            </div>
+          </div>
+          <div class="sidebar-stat">
+            <i [class]="getDepartmentIcon(form.category)"></i>
+            <div class="stat-info">
+              <span>Department</span>
+              <strong>{{ form.category || 'N/A' }}</strong>
+            </div>
+          </div>
+          <div class="sidebar-stat">
+            <i class="fas fa-money-bill-wave"></i>
+            <div class="stat-info">
+              <span>Budget</span>
+              <strong>{{ form.budget.max ? (form.budget.max | currency:'EGP ':'symbol':'1.0-0') : 'Set max' }}</strong>
+            </div>
+          </div>
+          <div class="sidebar-stat">
+            <i [class]="getExperienceIcon(form.experienceLevel)"></i>
+            <div class="stat-info">
+              <span>Experience</span>
+              <strong>{{ form.experienceLevel }}</strong>
+            </div>
+          </div>
+          <div class="sidebar-stat">
+            <i [class]="getWorkTypeIcon(form.workType)"></i>
+            <div class="stat-info">
+              <span>Work Type</span>
+              <strong>{{ formatEnum(form.workType) || 'Remote' }}</strong>
+            </div>
+          </div>
+          <div class="sidebar-stat">
+             <i class="fas fa-brain"></i>
+             <div class="stat-info">
+               <span>Skills</span>
+               <strong>{{ form.skillsRequired.length }} items</strong>
+             </div>
+          </div>
+          <div class="sidebar-stat">
+             <i class="fas fa-users"></i>
+             <div class="stat-info">
+               <span>Headcount</span>
+               <strong>{{ form.headcount || 1 }} position</strong>
+             </div>
+          </div>
+        </div>
+        
+        <div class="strength-indicator">
+           <div class="label-row">
+              <span>Brief Quality</span>
+              <strong>{{ ((form.title ? 1 : 0) + (form.category ? 1 : 0) + (form.description ? 1 : 0) + (form.workType ? 1 : 0) + (form.budget.min ? 1 : 0) + (form.budget.max ? 1 : 0) + (form.minExperience ? 1 : 0) + (form.experienceLevel ? 1 : 0) + (form.headcount ? 1 : 0) + (form.skillsRequired.length ? 1 : 0)) * 10 | number:'1.0-0' }}%</strong>
+           </div>
+           <div class="strength-bar-bg">
+              <div class="strength-fill" [style.width.%]="((form.title ? 1 : 0) + (form.category ? 1 : 0) + (form.description ? 1 : 0) + (form.workType ? 1 : 0) + (form.budget.min ? 1 : 0) + (form.budget.max ? 1 : 0) + (form.minExperience ? 1 : 0) + (form.experienceLevel ? 1 : 0) + (form.headcount ? 1 : 0) + (form.skillsRequired.length ? 1 : 0)) * 10"></div>
+           </div>
+        </div>
+      </div>
+    </aside>
+  </div>
+</div>

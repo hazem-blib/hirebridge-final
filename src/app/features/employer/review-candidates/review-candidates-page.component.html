@@ -1,0 +1,584 @@
+<div class="review-page-container">
+  <!-- 1. Loading State -->
+  <div *ngIf="loading" class="skeleton-wrapper fade-in-up" style="padding: 24px;">
+    <div class="skeleton-box skeleton-hero"></div>
+    <div class="skeleton-kpis">
+      <div class="skeleton-box skeleton-kpi"></div>
+      <div class="skeleton-box skeleton-kpi"></div>
+      <div class="skeleton-box skeleton-kpi"></div>
+      <div class="skeleton-box skeleton-kpi"></div>
+    </div>
+    <div class="skeleton-grid">
+      <div class="skeleton-box skeleton-panel"></div>
+      <div class="skeleton-box skeleton-panel"></div>
+    </div>
+  </div>
+
+  <!-- 2. Error State -->
+  <div *ngIf="!loading && viewMode === 'management' && (!job || error)" class="error-container fade-in">
+    <div class="error-card glass-panel">
+      <div class="error-icon">
+        <i class="fas fa-exclamation-triangle"></i>
+      </div>
+      <h2>Review Center Unavailable</h2>
+      <p>{{ error || 'We couldn\'t load the candidate review center for this request.' }}</p>
+      <div class="error-actions">
+        <a routerLink="/employer/jobs" class="btn-premium secondary">
+          <i class="fas fa-arrow-left"></i> All Requests
+        </a>
+        <button (click)="ngOnInit()" class="btn-premium primary">
+          <i class="fas fa-sync"></i> Retry
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Content State -->
+  <div class="employer-dashboard" *ngIf="!loading">
+    <!-- A. Job Selection View (Global List) -->
+    <ng-container *ngIf="viewMode === 'list'">
+      <header class="dash-hero fade-in-up">
+        <div class="dash-hero-left">
+          <div class="hero-greeting">
+            <div class="breadcrumb-premium">
+              <span>Recruitment Intelligence</span>
+              <i class="fas fa-chevron-right"></i>
+              <span>Review Center</span>
+            </div>
+            <h1>Review <span class="text-gradient">Center</span></h1>
+            <p>Select a hiring request to analyze its candidate pool and manage recruitment decisions.</p>
+          </div>
+        </div>
+
+        <div class="hero-right-group">
+          <div class="health-orb-card">
+            <div class="health-orb">
+              <svg viewBox="0 0 36 36" class="circular-chart blue">
+                <path class="circle-bg"
+                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                <path class="circle" stroke-dasharray="100, 100"
+                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                <text x="18" y="20.35" class="percentage">{{ allJobs.length }}</text>
+              </svg>
+            </div>
+            <div class="health-label">
+              <strong>Active Requests</strong>
+              <small>Global Review Pipeline</small>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <section class="job-selection-grid fade-in-up delay-1" *ngIf="allJobs.length; else emptyReviewHub">
+        <a class="job-selection-card" *ngFor="let j of allJobs"
+          [routerLink]="['/employer/jobs', j.id, 'review-candidates']">
+          <div class="job-selection-icon">
+            <i class="fas fa-user-tie"></i>
+          </div>
+          <div class="job-selection-info">
+            <h3>{{ j.title }}</h3>
+            <p>{{ j.department }} • {{ j.location }}</p>
+            <div class="job-selection-stats">
+              <div class="selection-stat-pill" title="Total Candidates">
+                <i class="fas fa-users"></i>
+                <strong>{{ getMatchedCandidatesForJob(j.id) }}</strong>
+              </div>
+              <div class="selection-stat-pill" title="Interviews Conducted">
+                <i class="fas fa-calendar-alt"></i>
+                <strong>{{ getInterviewCount(j.id) }}</strong>
+              </div>
+            </div>
+          </div>
+          <div class="job-selection-action">
+            <i class="fas fa-chevron-right"></i>
+          </div>
+        </a>
+      </section>
+      <ng-template #emptyReviewHub>
+        <div class="empty-pipeline-state fade-in-up">
+          <div class="empty-icon-box blue"><i class="fas fa-layer-group"></i></div>
+          <div class="empty-text-wrap">
+            <h3>Review Center Dormant</h3>
+            <p>No hiring requests found. Start by submitting a request to begin reviewing candidates.</p>
+          </div>
+          <button routerLink="/employer/jobs/new" class="btn-premium primary sm">
+            <i class="fas fa-plus"></i>
+            <span>Submit Request</span>
+          </button>
+        </div>
+      </ng-template>
+    </ng-container>
+
+    <!-- B. Management View (Specific Job Review) -->
+    <ng-container *ngIf="viewMode === 'management' && job">
+
+      <!-- Executive Intelligence Hero -->
+      <header class="dash-hero fade-in-up">
+        <div class="dash-hero-left">
+          <div class="hero-greeting">
+            <div class="breadcrumb-premium">
+              <a [routerLink]="requestDetailsLink">Hiring Requests</a>
+              <i class="fas fa-chevron-right"></i>
+              <span>Review Center</span>
+              <i class="fas fa-chevron-right"></i>
+              <span>{{ job.title }}</span>
+            </div>
+            <h1><span class="text-gradient">{{ job.title }}</span></h1>
+            <p>Analyze shortlisted profiles and manage decisions for this specific request.</p>
+
+            <div class="hero-tags-premium">
+              <span class="tag-pill-premium" *ngIf="averageFitScore >= 85">
+                <i class="fas fa-star"></i> High Sentiment
+              </span>
+              <span class="tag-pill-premium">
+                <i class="fas fa-users"></i> {{ job.openRoles }} Headcount
+              </span>
+              <span class="tag-pill-premium">
+                <i class="fas fa-map-marker-alt"></i> {{ job.location }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-right-group">
+          <div class="health-orb-card">
+            <div class="health-orb">
+              <svg viewBox="0 0 36 36" class="circular-chart blue">
+                <path class="circle-bg"
+                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                <path class="circle" [attr.stroke-dasharray]="reviewProgressPercent + ', 100'"
+                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                <text x="18" y="20.35" class="percentage">{{ reviewProgressPercent }}%</text>
+              </svg>
+            </div>
+            <div class="health-label">
+              <strong>Review Progress</strong>
+              <small>Decisions Submitted</small>
+            </div>
+          </div>
+          <div class="hero-quick-actions">
+            <button (click)="toggleRequestDrawer()" class="btn-action-card">
+              <i class="fas fa-exchange-alt"></i><span>Switch Request</span>
+            </button>
+            <button (click)="resetView()" class="btn-action-card">
+              <i class="fas fa-layer-group"></i><span>Back to List</span>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <!-- KPI Grid -->
+      <section class="premium-kpis fade-in-up delay-1">
+        <article class="kpi-intelligence-card">
+          <div class="kpi-icon blue"><i class="fas fa-users"></i></div>
+          <div class="kpi-content">
+            <span class="kpi-label">Profiles Sent</span>
+            <div class="kpi-val-row">
+              <h3>{{ visibleApplicants.length }}</h3>
+              <span class="trend-neutral">Total</span>
+            </div>
+            <p>Shortlisted candidates</p>
+          </div>
+        </article>
+
+        <article class="kpi-intelligence-card">
+          <div class="kpi-icon cyan"><i class="fas fa-bullseye"></i></div>
+          <div class="kpi-content">
+            <span class="kpi-label">Avg Fit Score</span>
+            <div class="kpi-val-row">
+              <h3>{{ averageFitScore }}%</h3>
+              <span class="trend-pos" *ngIf="averageFitScore >= 75">High</span>
+            </div>
+            <p>Matching Quality</p>
+          </div>
+        </article>
+
+        <article class="kpi-intelligence-card">
+          <div class="kpi-icon amber"><i class="fas fa-calendar-check"></i></div>
+          <div class="kpi-content">
+            <span class="kpi-label">Interviews</span>
+            <div class="kpi-val-row">
+              <h3>{{ scheduledInterviewCount }}</h3>
+              <span class="trend-warn">Pending</span>
+            </div>
+            <p>Scheduled loops</p>
+          </div>
+        </article>
+
+        <article class="kpi-intelligence-card">
+          <div class="kpi-icon success"><i class="fas fa-user-check"></i></div>
+          <div class="kpi-content">
+            <span class="kpi-label">Confirmed Hires</span>
+            <div class="kpi-val-row">
+              <h3>{{ hiredApplicants.length }}</h3>
+              <span class="trend-pos">Success</span>
+            </div>
+            <p>Onboarding started</p>
+          </div>
+        </article>
+      </section>
+
+      <div class="premium-grid-layout fade-in-up delay-2">
+        <!-- Main Review Section -->
+        <section class="glass-panel main-review">
+          <!-- Refined Candidate Pipeline Toolbar -->
+          <div class="review-intelligence-toolbar">
+            <div class="toolbar-left">
+              <div class="toolbar-title">
+                <h2>Candidate Pipeline</h2>
+                <p>Manage and review shortlisted profiles for this hiring request.</p>
+              </div>
+            </div>
+            <div class="toolbar-right">
+              <div class="tab-list-premium">
+                <button *ngFor="let tab of statusTabs" class="tab-item-premium" [class.active]="activeTab === tab.value"
+                  (click)="setActiveTab(tab.value)">
+                  <i [class]="getTabIcon(tab.value)"></i>
+                  <span>{{ tab.label === 'Replacement' ? 'Replace' : tab.label }}</span>
+                  <span class="tab-count">{{ getCandidateCount(tab.value) }}</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <article *ngIf="actionSuccess" class="success-toast">{{ actionSuccess }}</article>
+          <article *ngIf="actionError" class="error-toast">{{ actionError }}</article>
+
+          <div class="candidates-container" *ngIf="visibleApplicants.length; else emptySharedCandidates">
+            <div class="candidate-boxy-grid" *ngIf="displayedApplicants.length; else emptyTab">
+              <article [id]="'applicant-' + applicant.id" class="candidate-boxy-card fade-in-up"
+                [class.rejected-state]="applicant.companyDecision === 'rejected'"
+                *ngFor="let applicant of displayedApplicants">
+                
+                <div class="card-glass-glow"></div>
+
+                <div class="boxy-card-head">
+                  <div class="fit-ring-premium">
+                    <svg viewBox="0 0 36 36" class="circular-chart-mini">
+                      <path class="circle-bg-mini" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                      <path class="circle-mini" [attr.stroke-dasharray]="(applicant.fitScore || 0) + ', 100'" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                      <text x="18" y="21" class="percentage-mini">{{ applicant.fitScore || 0 }}%</text>
+                    </svg>
+                  </div>
+                  <div class="avatar-boxy">{{ getInitials(applicant.candidateName) }}</div>
+                  <div class="boxy-info">
+                    <h3>{{ applicant.candidateName }}</h3>
+                    <span>{{ applicant.department }}</span>
+                  </div>
+                </div>
+
+                <div class="boxy-card-body">
+                  <div class="boxy-stats-row">
+                    <div class="boxy-stat">
+                      <i class="fas fa-history"></i>
+                      <span>{{ applicant.experienceYears || 0 }}y</span>
+                    </div>
+                    <div class="boxy-stat">
+                      <i class="fas fa-briefcase"></i>
+                      <span>{{ applicant.workType || 'Flex' }}</span>
+                    </div>
+                    <div class="boxy-stat">
+                      <i class="fas fa-wallet"></i>
+                      <span>{{ ((applicant.salaryExpectation || 0) / 1000) | number:'1.0-0' }}k</span>
+                    </div>
+                  </div>
+                  <p class="boxy-summary">{{ applicant.notes || 'No summary provided.' }}</p>
+                </div>
+
+                <div class="boxy-card-footer">
+                  <div class="boxy-actions-row">
+                    <!-- Standard Actions (Hide if candidate rejected) -->
+                    <ng-container *ngIf="applicant.companyDecision !== 'hired' && getInterviewForApplicant(applicant.id)?.candidateStatus !== 'rejected'">
+                      <!-- Accept Icon -->
+                      <button *ngIf="applicant.companyDecision !== 'rejected'" 
+                        class="action-trigger-boxy accept"
+                        [class.active]="applicant.companyDecision === 'accepted_for_interview'"
+                        (click)="acceptCandidate(applicant)"
+                        [disabled]="processingApplicantId === applicant.id || applicant.companyDecision === 'accepted_for_interview'"
+                        title="Accept Candidate">
+                        <i class="fas fa-check-circle"></i>
+                      </button>
+
+                      <!-- Schedule Icon (Only if accepted) -->
+                      <button *ngIf="applicant.companyDecision === 'accepted_for_interview'"
+                        class="action-trigger-boxy schedule"
+                        [class.highlight]="hasScheduledInterview(applicant.id)"
+                        (click)="scheduleInterview(applicant)"
+                        [disabled]="processingApplicantId === applicant.id"
+                        [title]="hasScheduledInterview(applicant.id) ? 'Reschedule Interview' : 'Schedule Interview'">
+                        <i class="fas" [ngClass]="hasScheduledInterview(applicant.id) ? 'fa-calendar-check' : 'fa-calendar-plus'"></i>
+                      </button>
+
+                      <!-- Reject Icon -->
+                      <button class="action-trigger-boxy reject" 
+                        (click)="rejectCandidate(applicant)"
+                        [disabled]="processingApplicantId === applicant.id"
+                        *ngIf="applicant.companyDecision !== 'accepted_for_interview' && applicant.companyDecision !== 'rejected'"
+                        title="Reject Candidate">
+                        <i class="fas fa-times-circle"></i>
+                      </button>
+                    </ng-container>
+
+                    <!-- More Actions Group (Hide if candidate rejected) -->
+                    <div class="boxy-more-group" *ngIf="applicant.companyDecision !== 'hired' && applicant.companyDecision !== 'rejected' && getInterviewForApplicant(applicant.id)?.candidateStatus !== 'rejected'">
+                      <button class="action-trigger-boxy hire" 
+                        (click)="markHired(applicant)"
+                        [disabled]="processingApplicantId === applicant.id" 
+                        title="Direct Hire">
+                        <i class="fas fa-user-check"></i>
+                      </button>
+                      <button class="action-trigger-boxy replace" 
+                        (click)="requestReplacement(applicant)"
+                        [disabled]="processingApplicantId === applicant.id || applicant.companyDecision === 'request_replacement'"
+                        title="Request Replacement">
+                        <i class="fas fa-sync-alt"></i>
+                      </button>
+                    </div>
+
+                    <!-- Hired Badge -->
+                    <div class="hired-badge-boxy" *ngIf="applicant.companyDecision === 'hired'">
+                      <i class="fas fa-medal"></i>
+                      <span>Hired</span>
+                    </div>
+
+                    <!-- Rejected Badge (Detailed) -->
+                    <div class="rejected-badge-boxy candidate-dec" *ngIf="getInterviewForApplicant(applicant.id)?.candidateStatus === 'rejected'">
+                      <i class="fas fa-user-times"></i>
+                      <span>Candidate Declined</span>
+                    </div>
+
+                    <div class="rejected-badge-boxy" *ngIf="applicant.companyDecision === 'rejected' && getInterviewForApplicant(applicant.id)?.candidateStatus !== 'rejected'">
+                      <i class="fas fa-ban"></i>
+                      <span>Company Rejected</span>
+                    </div>
+                  </div>
+                </div>
+              </article>
+            </div>
+            <ng-template #emptyTab>
+              <div class="empty-pipeline-state fade-in-up">
+                <div class="empty-icon-box">
+                  <i class="fas fa-user-slash"></i>
+                </div>
+                <div class="empty-text-wrap">
+                  <h3>No candidates in {{ activeTabLabel }}</h3>
+                  <p>There are no profiles currently marked as {{ activeTabLabel.toLowerCase() }} in this pipeline.</p>
+                </div>
+              </div>
+            </ng-template>
+          </div>
+
+          <ng-template #emptySharedCandidates>
+            <div class="empty-pipeline-state fade-in-up">
+              <div class="empty-icon-box">
+                <i class="fas fa-users-slash"></i>
+              </div>
+              <div class="empty-text-wrap">
+                <h3>No Candidates Shared</h3>
+                <p>Profiles will appear here once they have been shortlisted for this specific hiring request.</p>
+              </div>
+            </div>
+          </ng-template>
+        </section>
+      </div>
+
+      <!-- Auxiliary Intelligence Row (Bottom Placement) -->
+      <div class="intelligence-aux-grid fade-in-up delay-3">
+        <article class="bento-card sidebar-intelligence">
+          <header class="panel-header">
+            <div class="panel-title-row">
+              <i class="fas fa-calendar-alt panel-icon amber"></i>
+              <h2>Scheduled Interviews</h2>
+            </div>
+          </header>
+
+          <div class="interview-list-premium" *ngIf="interviews.length; else noInterviews">
+            <div class="interview-card-mini" *ngFor="let interview of interviews">
+              <div class="i-head">
+                <strong>{{ interview.candidateName }}</strong>
+                <span class="status-pill scheduled-mini">{{ getInterviewStatusLabel(interview) }}</span>
+              </div>
+              <div class="i-meta">
+                <span><i class="fas fa-calendar-day"></i> {{ interview.date | date:'MMM d' }}</span>
+                <span><i class="fas fa-clock"></i> {{ interview.time }}</span>
+              </div>
+            </div>
+          </div>
+          <ng-template #noInterviews>
+            <div class="empty-mini-intelligence">
+              <div class="mini-glow-icon"><i class="fas fa-calendar-plus"></i></div>
+              <p>No interviews scheduled yet.</p>
+            </div>
+          </ng-template>
+        </article>
+
+        <article class="bento-card sidebar-intelligence blue-bg">
+          <header class="panel-header">
+            <div class="panel-title-row">
+              <i class="fas fa-lightbulb panel-icon blue"></i>
+              <h2>Recruitment Tip</h2>
+            </div>
+          </header>
+          <p class="tip-text">Fast decisions increase candidate acceptance rates by 40%. Try to review pending
+            profiles within 48 hours.</p>
+        </article>
+      </div>
+    </ng-container>
+  </div>
+
+  <!-- Interview Scheduling Modal - Elite Premium Design -->
+  <div class="details-modal-backdrop" *ngIf="interviewModalApplicant as applicant"
+    (click)="trackInterviewModalBackdrop($event)">
+    <div class="premium-modal-card preview-modal fade-in-up">
+      <div class="modal-elite-vertical">
+
+        <!-- Header -->
+        <header class="elite-modal-header">
+          <div class="header-main">
+            <div class="header-icon schedule-icon"><i class="fas fa-calendar-check"></i></div>
+            <div class="header-text">
+              <h2>Interview Setup</h2>
+              <p>Scheduling for {{ applicant.candidateName }}</p>
+            </div>
+          </div>
+          <button class="modal-close-btn-elite" (click)="closeInterviewModal()" title="Close">
+            <i class="fas fa-times"></i>
+          </button>
+        </header>
+
+        <!-- Form Body -->
+        <div class="elite-modal-scroll">
+          <form (ngSubmit)="submitInterviewSchedule()" class="elite-schedule-form" id="scheduleForm">
+
+            <!-- Date & Time Row -->
+            <div class="elite-form-row">
+              <div class="elite-field">
+                <label><i class="fas fa-calendar-day"></i> Date</label>
+                <div class="elite-input-wrap">
+                  <input id="fp-date" type="text" name="date" [(ngModel)]="interviewForm.date" placeholder="Pick a date"
+                    [customMonthDropdown]="fpDate" readonly />
+                </div>
+              </div>
+              <div class="elite-field">
+                <label><i class="fas fa-clock"></i> Time</label>
+                <div class="elite-input-wrap no-border no-bg">
+                  <app-premium-time-picker [(time)]="interviewForm.time"></app-premium-time-picker>
+                </div>
+              </div>
+            </div>
+
+            <!-- Type & Interviewer Row -->
+            <div class="elite-form-row">
+              <div class="elite-field">
+                <label><i class="fas fa-video"></i> Type</label>
+                <div class="elite-input-wrap has-custom-select" (click)="toggleTypeDropdown($event)">
+                  <div class="custom-select-trigger">
+                    <span class="trigger-value">
+                      <i [class]="getTypeIcon(interviewForm.type)"></i>
+                      {{ interviewForm.type }}
+                    </span>
+                    <i class="fas fa-chevron-down trigger-arrow" [class.open]="showTypeDropdown"></i>
+                  </div>
+
+                  <!-- Premium Type Panel -->
+                  <div class="premium-selection-panel type-select-panel" [class.show]="showTypeDropdown">
+                    <div class="panel-option" (click)="selectType('Online', $event)"
+                      [class.active]="interviewForm.type === 'Online'">
+                      <i class="fas fa-video"></i> Online
+                    </div>
+                    <div class="panel-option" (click)="selectType('Onsite', $event)"
+                      [class.active]="interviewForm.type === 'Onsite'">
+                      <i class="fas fa-building"></i> Onsite
+                    </div>
+                    <div class="panel-option" (click)="selectType('Phone', $event)"
+                      [class.active]="interviewForm.type === 'Phone'">
+                      <i class="fas fa-phone"></i> Phone
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="elite-field">
+                <label><i class="fas fa-user-tie"></i> Interviewer</label>
+                <div class="elite-input-wrap">
+                  <input type="text" name="interviewerName" [(ngModel)]="interviewForm.interviewerName"
+                    placeholder="Hiring Manager" />
+                </div>
+              </div>
+            </div>
+
+            <!-- Meeting Link (conditional) -->
+            <div class="elite-field" *ngIf="interviewForm.type === 'Online'">
+              <label><i class="fas fa-link"></i> Meeting Link</label>
+              <div class="elite-input-wrap">
+                <input type="url" name="meetingLink" [(ngModel)]="interviewForm.meetingLink"
+                  placeholder="https://meet.example.com/..." />
+              </div>
+            </div>
+
+            <!-- Notes -->
+            <div class="elite-field">
+              <label><i class="fas fa-sticky-note"></i> Notes</label>
+              <textarea class="elite-textarea" name="notes" rows="3" [(ngModel)]="interviewForm.notes"
+                placeholder="Interview focus points..."></textarea>
+            </div>
+
+          </form>
+        </div>
+
+        <!-- Footer -->
+        <footer class="elite-modal-footer">
+          <button type="button" class="btn-elite-secondary" (click)="closeInterviewModal()">Cancel</button>
+          <button type="submit" form="scheduleForm" class="btn-elite-primary"
+            [disabled]="processingApplicantId === applicant.id">
+            <i class="fas" [ngClass]="processingApplicantId === applicant.id ? 'fa-spinner fa-spin' : 'fa-check-circle'"></i>
+            {{ processingApplicantId === applicant.id ? 'Scheduling...' : 'Confirm Schedule' }}
+          </button>
+        </footer>
+
+      </div>
+    </div>
+  </div>
+
+
+
+  <div class="request-drawer-backdrop" *ngIf="isRequestDrawerOpen" (click)="toggleRequestDrawer()">
+    <div class="request-drawer" (click)="$event.stopPropagation()">
+      <header class="drawer-header">
+        <div class="drawer-header-copy">
+          <h2>Select Hiring Request</h2>
+          <p>Switch between your active recruitment pipelines</p>
+        </div>
+        <button class="btn-close-drawer" (click)="toggleRequestDrawer()">
+          <i class="fas fa-times"></i>
+        </button>
+      </header>
+
+      <div class="drawer-content">
+        <a *ngFor="let j of allJobs" [routerLink]="['/employer/jobs', j.id, 'review-candidates']"
+          (click)="isRequestDrawerOpen = false" [class.active]="job && j.id == job.id" class="drawer-job-card">
+          <div class="job-card-main">
+            <div class="job-card-icon" [class.active]="job && j.id == job.id">
+              <i class="fas fa-briefcase"></i>
+            </div>
+            <div class="job-card-info">
+              <h4>{{ j.title }}</h4>
+              <p>{{ j.department }} • {{ j.openRoles }} Roles</p>
+            </div>
+            <div class="job-card-stat" *ngIf="getMatchedCandidatesForJob(j.id) > 0">
+              <span>{{ getMatchedCandidatesForJob(j.id) }}</span>
+            </div>
+          </div>
+          <div class="job-card-footer">
+            <span class="status-pill" [class.open]="j.status !== 'Filled'" [class.closed]="j.status === 'Filled'">
+              {{ j.status === 'Filled' ? 'CLOSED' : 'ACTIVE' }}
+            </span>
+            <span class="location-tag"><i class="fas fa-map-marker-alt"></i> {{ j.location }}</span>
+          </div>
+          <div class="active-check" *ngIf="job && j.id == job.id">
+            <i class="fas fa-check-circle"></i>
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>

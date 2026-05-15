@@ -1,0 +1,164 @@
+@import '../candidate-page.shared.css';
+
+/* My Applications - Component Overrides */
+
+.filters-box {
+  background: white;
+  padding: 16px;
+  border-radius: 20px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.02);
+  min-width: 320px;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-wrapper i {
+  position: absolute;
+  left: 12px;
+  font-size: 0.8rem;
+  color: #94a3b8;
+}
+
+.input-wrapper input,
+.input-wrapper select {
+  width: 100%;
+  padding: 10px 12px 10px 36px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  font-size: 0.85rem;
+  font-family: inherit;
+  transition: border-color 0.2s ease;
+}
+
+.input-wrapper input:focus,
+.input-wrapper select:focus {
+  outline: none;
+  border-color: var(--cb-primary);
+}
+
+/* Table Specifics */
+.role-cell-new {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.role-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.role-meta span {
+  font-size: 0.75rem;
+  color: var(--cb-muted);
+}
+
+.score-tag {
+  background: #f0fdf4;
+  color: #166534;
+  padding: 2px 6px;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 0.65rem;
+}
+
+.interview-cell-new strong {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--cb-text);
+}
+
+.interview-cell-new small {
+  color: var(--cb-muted);
+  font-size: 0.75rem;
+}
+
+.muted-text {
+  color: #94a3b8;
+  font-size: 0.75rem;
+}
+
+.time-block strong {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--cb-text);
+}
+
+.time-block span {
+  font-size: 0.75rem;
+  color: var(--cb-muted);
+}
+
+/* Actions */
+.action-flex {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.btn-square-small {
+  width: 34px !important;
+  height: 34px !important;
+  padding: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 10px !important;
+  font-size: 0.8rem !important;
+}
+
+.decision-pill {
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 1.2rem;
+}
+
+.decision-pill.accepted { color: #10b981; }
+.decision-pill.rejected { color: #ef4444; }
+
+@media (max-width: 900px) {
+  .filters-box { min-width: 100%; }
+}
+
+/* ── Dark Mode Overrides ── */
+:host-context(body.dark) .filters-box {
+  background: #162032;
+  border-color: #243352;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+:host-context(body.dark) .input-wrapper input,
+:host-context(body.dark) .input-wrapper select {
+  background: #0f1729;
+  border-color: #243352;
+  color: #e2e8f0;
+}
+
+:host-context(body.dark) .score-tag {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+}
+
+:host-context(body.dark) .muted-text {
+  color: #8b9ab8;
+}
+
+:host-context(body.dark) .decision-pill {
+  background: #1a2333;
+}

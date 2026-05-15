@@ -1,0 +1,122 @@
+<article class="cv-event-panel fade-in-up">
+  <!-- Celebration Layer -->
+  <div *ngIf="status === 'success'" class="confetti-container">
+    <div class="confetti" *ngFor="let i of [1,2,3,4,5,6,7,8,9,10]"></div>
+  </div>
+
+  <div class="event-panel-head">
+    <div class="head-milestone">
+      <div class="milestone-icon">
+        <i class="fas fa-rocket"></i>
+      </div>
+      <div class="milestone-text">
+        <span class="milestone-label">Critical Milestone</span>
+        <h3>Unlock Your Future</h3>
+      </div>
+    </div>
+  </div>
+
+  <div class="event-panel-body">
+    <!-- UPLOAD ZONE -->
+    <div class="event-upload-zone" 
+         [class.is-dragging]="isDragging"
+         [class.is-success]="status === 'success'"
+         (dragover)="onDragOver($event)" 
+         (dragleave)="onDragLeave($event)" 
+         (drop)="onDrop($event)">
+
+      <!-- EMPTY / ERROR -->
+      <div *ngIf="status === 'empty' || status === 'error'" class="event-content">
+        <div class="event-visual-main">
+          <div class="orbit-container">
+            <div class="orbit-circle"></div>
+            <i class="fas fa-file-pdf main-pdf-icon"></i>
+          </div>
+        </div>
+        
+        <div class="event-text-stack">
+          <h4>Upload Your Professional CV</h4>
+          <p>Required to unlock job applications and AI matching</p>
+        </div>
+        
+        <input type="file" id="cvFile" accept=".pdf" class="event-hidden-input" (change)="onFileSelected($event)" />
+        <label for="cvFile" class="event-primary-btn">
+          <i class="fas fa-plus-circle"></i>
+          Choose Document
+        </label>
+        
+        <div *ngIf="status === 'error'" class="event-error-msg">
+          <i class="fas fa-exclamation-triangle"></i> {{ errorMessage }}
+        </div>
+      </div>
+
+      <!-- PROCESSING -->
+      <div *ngIf="status === 'uploading' || status === 'checking'" class="event-content processing-state">
+        <div class="event-smart-loader">
+          <div class="loader-ring"></div>
+          <div class="loader-core">
+            <i class="fas" [class.fa-cloud-upload-alt]="status === 'uploading'" [class.fa-shield-check]="status === 'checking'"></i>
+          </div>
+        </div>
+        
+        <div class="processing-info">
+          <h4 class="event-loading-title">{{ status === 'uploading' ? 'Transmitting Data' : 'Security Analysis' }}</h4>
+          <p class="processing-sub">{{ status === 'uploading' ? 'Optimizing CV for matching...' : 'Verifying document integrity...' }}</p>
+        </div>
+
+        <div class="event-progress-wrap">
+          <div class="event-progress-bar" [style.width]="status === 'uploading' ? '45%' : '85%'">
+            <div class="progress-glow"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- UPLOADED UNVERIFIED -->
+      <div *ngIf="status === 'uploaded_unverified'" class="event-content">
+        <div class="event-file-preview">
+          <div class="preview-icon"><i class="fas fa-file-pdf"></i></div>
+          <div class="preview-info">
+            <span class="p-name">{{ fileName }}</span>
+            <span class="p-status">Pending Security Scan</span>
+          </div>
+        </div>
+        <button class="event-verify-btn" (click)="verifyCv()">
+          <i class="fas fa-check-double"></i> Verify & Unlock
+        </button>
+        <button class="event-text-action" (click)="reset()">Replace file</button>
+      </div>
+
+      <!-- SUCCESS: THE CELEBRATION -->
+      <div *ngIf="status === 'success'" class="event-content success-event">
+        <div class="congrats-visual">
+          <div class="congrats-ring"></div>
+          <div class="congrats-icon"><i class="fas fa-trophy"></i></div>
+        </div>
+        
+        <div class="congrats-text">
+          <h4 class="congrats-title">Congratulations!</h4>
+          <p class="congrats-sub">Your CV is verified. Jobs are now unlocked!</p>
+          <div class="filename-badge-success">{{ fileName }}</div>
+        </div>
+
+        <div class="congrats-actions">
+          <button class="action-pill" (click)="viewCv()"><i class="fas fa-eye"></i> View</button>
+          <button class="action-pill outline" (click)="reset()"><i class="fas fa-redo"></i> Replace</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- EVENT STATUS BAR -->
+    <div class="event-status-tracker">
+      <div class="tracker-item" [class.active]="status !== 'empty' && status !== 'error'">
+        <div class="tracker-dot"></div>
+        <span>Upload</span>
+      </div>
+      <div class="tracker-line"></div>
+      <div class="tracker-item" [class.active]="status === 'success'">
+        <div class="tracker-dot"></div>
+        <span>Verified</span>
+      </div>
+    </div>
+  </div>
+</article>

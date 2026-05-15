@@ -1,0 +1,505 @@
+<div class="employer-dashboard">
+  @if (loading) {
+  <div class="skeleton-wrapper fade-in-up" style="padding: 24px;">
+    <div class="skeleton-box skeleton-hero"></div>
+    <div class="skeleton-panel">
+      <div class="skeleton-box skeleton-row"></div>
+      <div class="skeleton-box skeleton-row"></div>
+      <div class="skeleton-box skeleton-row"></div>
+      <div class="skeleton-box skeleton-row"></div>
+    </div>
+  </div>
+  } @else {
+  <!-- Executive Summary Hero -->
+  <!-- Executive Summary Hero (Dashboard Style) -->
+  <header class="dash-hero fade-in-up">
+    <div class="dash-hero-left">
+      <div class="hero-greeting">
+        <div class="breadcrumb-premium">
+          <span><i class="fas fa-terminal"></i> Recruitment Intelligence</span>
+          <i class="fas fa-chevron-right"></i>
+          <span>Pipeline Overview</span>
+        </div>
+        <h1>Track your <span class="text-gradient">Hiring Requests</span></h1>
+        <p>Follow each request from brief to hire. You have <strong>{{ activeJobs.length }}</strong> active requests in
+          your pipeline.</p>
+      </div>
+    </div>
+
+    <div class="hero-right-group">
+      <div class="health-orb-card">
+        <div class="health-orb">
+          <svg viewBox="0 0 36 36" class="circular-chart blue">
+            <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+            <path class="circle"
+              [style.stroke-dasharray]="(totalHeadcount ? (( (totalHeadcount - upcomingInterviews) / totalHeadcount) * 100) : 0) + ', 100'"
+              d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+            <text x="18" y="20.35" class="percentage">{{ activeJobs.length }}</text>
+          </svg>
+        </div>
+        <div class="health-label">
+          <strong>Active Pipeline</strong>
+          <small>{{ totalHeadcount }} positions requested</small>
+        </div>
+      </div>
+      <div class="hero-quick-actions">
+        <button routerLink="/employer/jobs/new" class="btn-action-card">
+          <i class="fas fa-plus"></i><span>Submit New Request</span>
+        </button>
+        <button (click)="loadJobs()" class="btn-action-card">
+          <i class="fas fa-sync-alt"></i><span>Refresh Data</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <article *ngIf="error" class="error-toast">{{ error }}</article>
+
+  <!-- Pipeline Intelligence Stats -->
+  <div class="intelligence-stats-row fade-in-up delay-1">
+    <div class="stat-card-mini">
+      <div class="stat-icon blue"><i class="fas fa-rocket"></i></div>
+      <div class="stat-val">
+        <strong>{{ activeJobs.length }}</strong>
+        <span>Active Jobs</span>
+      </div>
+    </div>
+    <div class="stat-card-mini">
+      <div class="stat-icon amber"><i class="fas fa-clock"></i></div>
+      <div class="stat-val">
+        <strong>{{ upcomingInterviews }}</strong>
+        <span>Interviews</span>
+      </div>
+    </div>
+    <div class="stat-card-mini">
+      <div class="stat-icon green"><i class="fas fa-check-circle"></i></div>
+      <div class="stat-val">
+        <strong>{{ completedJobs.length }}</strong>
+        <span>Filled Roles</span>
+      </div>
+    </div>
+    <div class="stat-card-mini">
+      <div class="stat-icon purple"><i class="fas fa-users"></i></div>
+      <div class="stat-val">
+        <strong>{{ totalHeadcount }}</strong>
+        <span>Total Hires</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Active Hiring Requests Section -->
+  <section class="glass-panel wide fade-in-up delay-2">
+    <header class="panel-header">
+      <div class="panel-title-row">
+        <div class="panel-icon pulse"><i class="fas fa-wave-square"></i></div>
+        <h3>Active Hiring Requests</h3>
+      </div>
+      <div class="header-tools">
+        <div class="live-indicator">
+          <span class="pulse-dot"></span>
+          <span>Live Pipeline</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="pipeline-grid">
+      <div class="pipeline-header">
+        <div class="col-role">Role & Details</div>
+        <div class="col-progress">Hiring Pulse</div>
+        <div class="col-interviews">Interviews</div>
+        <div class="col-budget">Budget & Work</div>
+        <div class="col-actions">Actions</div>
+      </div>
+
+      <div class="pipeline-content" *ngIf="activeJobs.length; else emptyJobs">
+        <div *ngFor="let job of activeJobs" class="pipeline-row">
+          <div class="col-role">
+            <div class="role-info-card">
+              <div class="role-icon-box blue-soft">
+                <i class="fas fa-user-tie"></i>
+                <span class="count-badge">{{ job.openRoles }}</span>
+              </div>
+              <div class="role-text">
+                <strong>{{ job.title }}</strong>
+                <div class="role-meta">
+                  <span class="posted-time-clean" title="Posted Date"><i class="far fa-clock"></i> {{ job.createdAt | date:'MMM d, HH:mm' }}</span>
+                  <span class="dot-sep"></span>
+                  <span [class]="'dept-pill ' + getDeptTone(job.department)">{{ job.department }}</span>
+                  <span class="dot-sep"></span>
+                  <span class="exp-label-clean">{{ getExperienceLabel(job.experienceLevel) }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-progress">
+            <div class="pulse-progress-container">
+              <div class="pulse-label">
+                <span>Filled <strong>{{ getHiredCount(job.id) }}/{{ job.openRoles }}</strong></span>
+                <span class="pct">{{ ((getHiredCount(job.id) / (job.openRoles || 1)) * 100) | number:'1.0-0' }}%</span>
+              </div>
+              <div class="pulse-bar-bg">
+                <div class="pulse-fill" [style.width.%]="(getHiredCount(job.id) / (job.openRoles || 1)) * 100"></div>
+              </div>
+              <div class="pulse-status-row">
+                <span class="status-item"><i class="fas fa-user-clock"></i> {{ getPendingCount(job.id) }}
+                  Reviewing</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-interviews">
+            <div class="smart-interview-card">
+              <div class="main-val">{{ getInterviewCount(job.id) }}</div>
+              <div class="sub-val">
+                <i class="fas fa-calendar-alt"></i>
+                <span>{{ getUpcomingInterviewCount(job.id) }} Upcoming</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-budget">
+            <div class="budget-badge-stack">
+              <div class="amount-pill">
+                <i class="fas fa-money-bill-wave"></i>
+                <span>{{ job.salary | currency:'EGP ':'symbol':'1.0-0' }}</span>
+              </div>
+              <div class="location-pill">
+                <i class="fas fa-map-marker-alt"></i>
+                <span>{{ job.location }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-actions">
+            <div class="integrated-action-hub">
+              <button class="hub-btn view" (click)="openJobDetails(job.id)" title="View Full Details">
+                <i class="fas fa-circle-info"></i>
+              </button>
+              <button class="hub-btn primary" (click)="openReviewCandidates(job.id)"
+                [disabled]="!loading && getPendingCount(job.id) === 0" title="Review New Candidates">
+                <i class="fas fa-users-viewfinder"></i>
+                <span class="btn-label">Review</span>
+              </button>
+              <div class="hub-dropdown">
+                <button class="hub-btn secondary" [routerLink]="['/employer/jobs', job.id, 'interviews']"
+                  title="Calendar">
+                  <i class="fas fa-calendar-day"></i>
+                </button>
+                <button class="hub-btn danger" (click)="deleteJob(job)" title="Delete Request">
+                  <i class="fas fa-trash-alt"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <ng-template #emptyJobs>
+        <div class="empty-pipeline-state fade-in-up">
+          <div class="empty-icon-box blue"><i class="fas fa-folder-open"></i></div>
+          <div class="empty-text-wrap">
+            <h3>No Active Requests</h3>
+            <p>Your recruitment cycle is clear. Submit a new hiring request to start finding top talent.</p>
+          </div>
+          <button routerLink="/employer/jobs/new" class="btn-premium primary sm">
+            <i class="fas fa-plus"></i>
+            <span>Create New Request</span>
+          </button>
+        </div>
+      </ng-template>
+    </div>
+  </section>
+
+  <!-- Completed & Filled Requests Section -->
+  <section class="glass-panel wide fade-in-up delay-2" *ngIf="completedJobs.length">
+    <header class="panel-header">
+      <div class="panel-title-row">
+        <div class="panel-icon green"><i class="fas fa-check-double"></i></div>
+        <h3>Completed & Filled</h3>
+      </div>
+      <div class="header-tools">
+        <span class="stat-badge success"><i class="fas fa-award"></i> {{ completedJobs.length }} Success Stories</span>
+      </div>
+    </header>
+
+    <div class="pipeline-grid">
+      <div class="pipeline-header">
+        <div class="col-role">Role & History</div>
+        <div class="col-progress">Success Rate</div>
+        <div class="col-interviews">Total Activity</div>
+        <div class="col-budget">Final Details</div>
+        <div class="col-actions">Actions</div>
+      </div>
+
+      <div class="pipeline-content">
+        <div *ngFor="let job of completedJobs" class="pipeline-row success-border">
+          <div class="col-role">
+            <div class="role-info-card">
+              <div class="role-icon-box success-light">
+                <i class="fas fa-award"></i>
+              </div>
+              <div class="role-text">
+                <strong>{{ job.title }}</strong>
+                <div class="role-meta">
+                  <span [class]="'dept-pill ' + getDeptTone(job.department)">{{ job.department }}</span>
+                  <span class="dot-sep"></span>
+                  <span class="final-badge">FILLED</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-progress">
+            <div class="pulse-progress-container">
+              <div class="pulse-label">
+                <span class="success-text"><strong>{{ job.hiredCount }}/{{ job.openRoles }}</strong> Roles Filled</span>
+                <span class="pct success">100%</span>
+              </div>
+              <div class="pulse-bar-bg">
+                <div class="pulse-fill success-gradient" style="width: 100%"></div>
+              </div>
+              <div class="pulse-status-row">
+                <span class="status-item success-text"><i class="fas fa-check-circle"></i> Pipeline Complete</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-interviews">
+            <div class="smart-interview-card success-light">
+              <div class="main-val">{{ getInterviewCount(job.id) }}</div>
+              <div class="sub-val">
+                <i class="fas fa-history"></i>
+                <span>Interviews Conducted</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-budget">
+            <div class="budget-badge-stack">
+              <div class="amount-pill success-light">
+                <i class="fas fa-file-contract"></i>
+                <span>{{ job.salary | currency:'EGP ':'symbol':'1.0-0' }}</span>
+              </div>
+              <div class="location-pill">
+                <i class="fas fa-clock"></i>
+                <span>Closed {{ job.createdAt | date:'MMM yyyy' }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-actions">
+            <div class="integrated-action-hub">
+              <button class="hub-btn view" (click)="openJobDetails(job.id)" title="View Full Timeline">
+                <i class="fas fa-circle-info"></i>
+              </button>
+              <button class="hub-btn secondary success-btn" (click)="openJobDetails(job.id)">
+                <i class="fas fa-history"></i>
+                <span class="btn-label">View History</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Job Details / Request Preview Modal -->
+  <div class="details-modal-backdrop" *ngIf="selectedJob" (click)="trackModalBackdrop($event)">
+    <div class="premium-modal-card preview-modal fade-in-up">
+      <!-- Unified Elite Job Details Modal -->
+      <div class="modal-elite-vertical">
+        <!-- Loading Overlay -->
+        <div class="elite-modal-loading-overlay" *ngIf="detailsLoading">
+          <div class="elite-spinner"></div>
+        </div>
+
+        <!-- Header -->
+        <header class="elite-modal-header">
+          <div class="header-main">
+            <div class="header-icon"><i class="fas fa-file-invoice"></i></div>
+            <div class="header-text">
+              <h2>Job Details</h2>
+              <p>Request Preview • Ref: {{ selectedJob.id.slice(-6) }}</p>
+            </div>
+          </div>
+          <button class="modal-close-btn-elite" (click)="closeJobDetails()" title="Close details">
+            <i class="fas fa-times"></i>
+          </button>
+        </header>
+
+        <!-- Content -->
+        <div class="elite-modal-scroll" [class.blur-content]="detailsLoading">
+          <div class="candidate-hero-card job-hero">
+            <div class="hero-left">
+              <div class="avatar-elite-circle job-icon-bg"><i class="fas fa-briefcase"></i></div>
+              <div class="hero-titles">
+                <h3>{{ selectedJob.title }}</h3>
+                <div class="hero-meta">
+                  <span>{{ selectedJob.department }}</span>
+                  <span class="dot"></span>
+                  <span>{{ selectedJob.location }}</span>
+                </div>
+              </div>
+            </div>
+            <div class="hero-right">
+              <div class="status-badge-elite" [class.filled]="selectedJob.status === 'Filled'">
+                {{ selectedJob.status }}
+              </div>
+            </div>
+          </div>
+
+          <div class="elite-stats-row">
+            <div class="elite-stat-item">
+              <i class="fas fa-wallet"></i>
+              <div class="stat-copy">
+                <small>Budget</small>
+                <strong>{{ selectedJob.salary | currency:'EGP ':'symbol':'1.0-0' }}</strong>
+              </div>
+            </div>
+            <div class="elite-stat-item">
+              <i class="fas fa-users"></i>
+              <div class="stat-copy">
+                <small>Open Roles</small>
+                <strong>{{ selectedHiredCandidatesCount }} / {{ selectedJob.openRoles }}</strong>
+              </div>
+            </div>
+            <div class="elite-stat-item">
+              <i class="fas fa-star"></i>
+              <div class="stat-copy">
+                <small>Avg. Fit</small>
+                <strong>{{ selectedAverageFitScore }}%</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="elite-insights-section">
+            <label><i class="fas fa-align-left"></i> Full Job Brief</label>
+            <p>{{ selectedJob.description }}</p>
+            <div class="skills-wrap-elite" *ngIf="selectedJob.skillsRequired.length">
+              <span class="skill-tag-elite" *ngFor="let s of selectedJob.skillsRequired">{{ s }}</span>
+            </div>
+          </div>
+
+          <div class="elite-insights-section">
+            <label><i class="fas fa-history"></i> Interview Timeline</label>
+            <div class="timeline-list-elite" *ngIf="selectedJobInterviews.length; else noModalInterviews">
+              <div class="timeline-item-elite" *ngFor="let i of selectedJobInterviews">
+                <div class="timeline-marker"></div>
+                <div class="timeline-content">
+                  <strong>{{ i.candidateName }}</strong>
+                  <small>{{ i.date | date:'MMM d' }} • {{ i.status }}</small>
+                </div>
+              </div>
+            </div>
+            <ng-template #noModalInterviews>
+              <p class="muted-small-elite">No interviews scheduled yet.</p>
+            </ng-template>
+          </div>
+        </div>
+
+        <footer class="elite-modal-footer">
+          <button class="btn-elite-secondary" (click)="closeJobDetails()">Close Preview</button>
+          <button class="btn-elite-primary" [routerLink]="['/employer/jobs', selectedJob.id, 'interviews']">
+            <i class="fas fa-calendar-alt"></i> Manage Interviews
+          </button>
+        </footer>
+      </div>
+    </div>
+  </div>
+
+  <!-- Candidate Preview Modal -->
+  <div class="details-modal-backdrop" *ngIf="candidatePreviewJob" (click)="trackCandidatePreviewBackdrop($event)">
+    <div class="premium-modal-card preview-modal fade-in-up">
+      <div class="modal-elite-vertical" *ngIf="!candidatePreviewLoading && previewedCandidate as candidate">
+        <header class="elite-modal-header">
+          <div class="header-main">
+            <div class="header-icon"><i class="fas fa-user-check"></i></div>
+            <div class="header-text">
+              <h2>{{ candidatePreviewJob.title }}</h2>
+              <p>Candidate Preview • {{ candidatePreviewApplicants.length }} Awaiting Review</p>
+            </div>
+          </div>
+          <button class="modal-close-btn-elite" (click)="closeCandidatePreview()" title="Close preview">
+            <i class="fas fa-times"></i>
+          </button>
+        </header>
+
+        <div class="elite-modal-scroll">
+          <div class="elite-top-bar">
+            <div class="pagination-elite">
+              <button class="btn-nav-compact" (click)="showPreviousCandidate()"
+                [disabled]="!hasPreviousPreviewCandidate">
+                <i class="fas fa-chevron-left"></i>
+              </button>
+              <span>Candidate <strong>{{ candidatePreviewIndex + 1 }}</strong> of {{ candidatePreviewApplicants.length
+                }}</span>
+              <button class="btn-nav-compact" (click)="showNextCandidate()" [disabled]="!hasNextPreviewCandidate">
+                <i class="fas fa-chevron-right"></i>
+              </button>
+            </div>
+            <button class="btn-ghost-compact" (click)="openFullReviewFromPreview()">
+              Review Hub <i class="fas fa-external-link-alt"></i>
+            </button>
+          </div>
+
+          <div class="candidate-hero-card">
+            <div class="hero-left">
+              <div class="avatar-elite-circle">{{ candidate.candidateName.charAt(0) }}</div>
+              <div class="hero-titles">
+                <h3>{{ candidate.candidateName }}</h3>
+                <div class="hero-meta">
+                  <span>{{ candidate.department }}</span>
+                  <span class="dot"></span>
+                  <span>{{ candidate.experienceYears }} Years Exp</span>
+                </div>
+              </div>
+            </div>
+            <div class="hero-right">
+              <div class="match-mini-orb">
+                <svg viewBox="0 0 36 36" class="circular-orb">
+                  <path class="orb-bg"
+                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                  <path class="orb-progress" [style.stroke-dasharray]="candidate.fitScore + ', 100'"
+                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                </svg>
+                <div class="orb-val"><strong>{{ candidate.fitScore }}%</strong></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="elite-stats-row">
+            <div class="elite-stat-item">
+              <i class="fas fa-wallet"></i>
+              <div class="stat-copy"><small>Expected</small><strong>{{ candidate.salaryExpectation | currency:'EGP
+                  ':'symbol':'1.0-0' }}</strong></div>
+            </div>
+            <div class="elite-stat-item">
+              <i class="fas fa-chart-pie"></i>
+              <div class="stat-copy"><small>Budget Match</small><strong>{{ getSalaryMatchLabel(candidate.salaryMatch)
+                  }}</strong></div>
+            </div>
+            <div class="elite-stat-item">
+              <i class="fas fa-home"></i>
+              <div class="stat-copy"><small>Work Type</small><strong>{{ candidate.workType || 'Flexible' }}</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="elite-insights-section">
+            <label><i class="fas fa-quote-left"></i> Recruitment Insights</label>
+            <p>{{ candidate.notes || 'No detailed insights available for this candidate at this stage.' }}</p>
+          </div>
+        </div>
+
+        <footer class="elite-modal-footer">
+          <button class="btn-elite-secondary" (click)="rejectPreviewCandidate()"><i class="fas fa-user-slash"></i>
+            Reject</button>
+          <button class="btn-elite-primary" (click)="acceptPreviewCandidate()"><i class="fas fa-calendar-check"></i>
+            Accept</button>
+        </footer>
+      </div>
+    </div>
+  </div>
+  }
+</div>

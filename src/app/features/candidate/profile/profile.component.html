@@ -1,0 +1,141 @@
+<section class="candidate-page">
+  <article class="cb-hero fade-in-up">
+    <div class="hero-content profile-hero-main">
+      <div class="profile-avatar-premium">
+        {{ user?.name?.charAt(0)?.toUpperCase() || 'U' }}
+      </div>
+      <div class="profile-info-new">
+        <p class="cb-eyebrow">Professional Profile</p>
+        <h1>{{ user?.name || 'Candidate' }}</h1>
+        <div class="profile-sub-meta">
+          <span><i class="fas fa-envelope"></i> {{ user?.email }}</span>
+          <span class="sep"></span>
+          <span><i class="fas fa-id-badge"></i> Verified Professional</span>
+        </div>
+      </div>
+    </div>
+
+    <aside class="exec-visual sync-box">
+      <button type="button" class="cb-btn cb-btn-soft sync-btn-new" (click)="loadProfile()" [disabled]="loadingProfile">
+        <i class="fas fa-sync-alt" [class.fa-spin]="loadingProfile"></i>
+        Sync Status
+      </button>
+    </aside>
+  </article>
+
+  <article *ngIf="successMessage" class="cb-success-box">{{ successMessage }}</article>
+  <article *ngIf="error" class="cb-error">{{ error }}</article>
+
+  <div class="profile-layout-grid fade-in-up delay-1">
+    <article class="cb-panel">
+      <header class="cb-panel-head">
+        <div>
+          <p class="cb-eyebrow">Career Settings</p>
+          <h3>Refine your profile details</h3>
+        </div>
+      </header>
+
+      <form [formGroup]="profileForm" (ngSubmit)="submit()" class="premium-form">
+        <div class="form-grid-new">
+          <div class="field-new">
+            <label>Specialization</label>
+            <div class="input-icon-box">
+              <i class="fas fa-briefcase"></i>
+              <select formControlName="specialization">
+                <option value="">Select Specialization</option>
+                <option *ngFor="let dep of departments" [value]="dep">{{ dep }}</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="field-new">
+            <label>Experience Level</label>
+            <div class="input-icon-box">
+              <i class="fas fa-signal"></i>
+              <select formControlName="experienceLevel">
+                <option value="">Select Level</option>
+                <option *ngFor="let level of experienceLevels" [value]="level">{{ level }}</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field-new">
+            <label>Min Salary ($)</label>
+            <div class="input-icon-box">
+              <i class="fas fa-money-bill-wave"></i>
+              <input type="number" formControlName="minSalary" placeholder="1000" />
+            </div>
+          </div>
+
+          <div class="field-new">
+            <label>Max Salary ($)</label>
+            <div class="input-icon-box">
+              <i class="fas fa-hand-holding-usd"></i>
+              <input type="number" formControlName="maxSalary" placeholder="5000" />
+            </div>
+          </div>
+
+          <div class="field-new">
+            <label>Work Type</label>
+            <div class="input-icon-box">
+              <i class="fas fa-laptop-house"></i>
+              <select formControlName="workType">
+                <option value="">Select Type</option>
+                <option *ngFor="let type of workTypes" [value]="type">{{ formatEnum(type) }}</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="field-new full-width">
+          <label>Professional Skills</label>
+          <div class="skills-manager">
+            <div class="skills-input-row">
+              <input 
+                type="text" 
+                placeholder="Add a skill (e.g. Angular, UI Design)..." 
+                [(ngModel)]="skillInput" 
+                [ngModelOptions]="{standalone: true}" 
+                (keydown.enter)="addSkill($event)" 
+              />
+              <button type="button" class="btn-add-skill" (click)="addSkill($event)">
+                <i class="fas fa-plus"></i>
+              </button>
+            </div>
+            <div class="skills-display" *ngIf="skills.length > 0">
+              <span class="skill-tag-premium" *ngFor="let skill of skills; let i = index">
+                {{ skill }}
+                <i class="fas fa-times" (click)="removeSkill(i)"></i>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-footer">
+          <button type="submit" class="cb-btn cb-btn-primary save-btn-full" [disabled]="savingProfile">
+            <i class="fas fa-save"></i>
+            {{ savingProfile ? 'Saving Changes...' : 'Update Profile' }}
+          </button>
+        </div>
+      </form>
+    </article>
+
+    <aside class="sidebar-new">
+      <app-cv-upload id="cv-upload-section" [currentCvUrl]="user?.candidateProfile?.cvUrl"></app-cv-upload>
+      
+      <div class="cb-panel profile-stats-panel">
+        <p class="cb-eyebrow">Quick Stats</p>
+        <div class="mini-stats-grid">
+          <div class="mini-stat-card">
+            <strong>{{ skills.length }}</strong>
+            <span>Skills</span>
+          </div>
+          <div class="mini-stat-card">
+            <strong>{{ profileForm.get('experienceLevel')?.value || 'N/A' }}</strong>
+            <span>Level</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </div>
+</section>

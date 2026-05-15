@@ -1,0 +1,199 @@
+<div class="tracker-dashboard">
+  <!-- ─── Original Hero (Reverted) ─── -->
+  <header class="dash-hero fade-in-smooth">
+    <div class="dash-hero-left">
+      <div class="hero-greeting">
+        <span class="badge-premium"><i class="fas fa-magic"></i> AI Sourcing</span>
+        <h1>Matched <span class="text-gradient">Opportunities</span></h1>
+        <p class="hero-brief">
+          These jobs have been specially selected for you. Track your application status live as it moves through the
+          hiring pipeline.
+        </p>
+      </div>
+    </div>
+  </header>
+
+  <!-- ─── Intelligence Insights Row (New) ─── -->
+  <div class="intel-cards-row fade-in-smooth delay-1">
+    <div class="intel-card-premium">
+      <div class="intel-icon-box blue"><i class="fas fa-bullseye"></i></div>
+      <div class="intel-info">
+        <span class="intel-val">{{ matchedJobs.length }}</span>
+        <span class="intel-lab">Total Matches</span>
+      </div>
+    </div>
+    <div class="intel-card-premium">
+      <div class="intel-icon-box purple"><i class="fas fa-calendar-alt"></i></div>
+      <div class="intel-info">
+        <span class="intel-val">{{ getCountByStatus('Interview Scheduled') }}</span>
+        <span class="intel-lab">Interviews</span>
+      </div>
+    </div>
+    <div class="intel-card-premium">
+      <div class="intel-icon-box green"><i class="fas fa-chart-line"></i></div>
+      <div class="intel-info">
+        <span class="intel-val">{{ averageFitScore }}%</span>
+        <span class="intel-lab">Avg. Fit Score</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── Opportunities Grid ─── -->
+  <div class="opportunities-grid fade-in-up" *ngIf="!isLoading && matchedJobs.length > 0">
+    <article class="compact-opp-card" *ngFor="let job of matchedJobs; let i = index"
+      [style.animation-delay]="(i * 0.1) + 's'" 
+      [class.is-hired]="job.status === 'Hired'"
+      [class.is-rejected]="job.status === 'Rejected'"
+      (click)="viewJobDetails(job)">
+      
+      <!-- Special State Overlays -->
+      <div class="state-status-indicator" *ngIf="job.status === 'Hired' || job.status === 'Rejected'">
+        <span class="indicator-pill" [ngClass]="job.status.toLowerCase()">
+          <i class="fas" [ngClass]="job.status === 'Hired' ? 'fa-check-circle' : 'fa-times-circle'"></i>
+          {{ job.status }}
+        </span>
+      </div>
+
+      <div class="card-body-compact">
+        <!-- Top Row: Brand & Score -->
+        <div class="brand-row">
+          <div class="brand-left">
+            <div class="brand-logo-small">
+              <img *ngIf="job.companyLogo" [src]="job.companyLogo" [alt]="job.companyName" (error)="job.companyLogo = ''">
+              <div *ngIf="!job.companyLogo" class="logo-init">{{ job.companyName.charAt(0) }}</div>
+            </div>
+            <div class="brand-text">
+              <h3 class="job-name">{{ job.jobTitle }}</h3>
+              <span class="comp-name">{{ job.companyName }}</span>
+            </div>
+          </div>
+          
+          <div class="match-score-pill" [class.high]="job.matchScore >= 90">
+            <span class="score-val">{{ job.matchScore }}%</span>
+            <span class="score-lab">Fit</span>
+          </div>
+        </div>
+
+        <!-- Hired/Rejected Context Messages -->
+        <div class="context-banner" *ngIf="job.status === 'Hired'">
+           <div class="banner-icon">🎊</div>
+           <div class="banner-text">
+              <strong>Congratulations!</strong> You are hired.
+           </div>
+        </div>
+        <div class="context-banner rejected" *ngIf="job.status === 'Rejected'">
+           <div class="banner-icon">💪</div>
+           <div class="banner-text">
+              <strong>Keep Going!</strong> Better things are coming your way.
+           </div>
+        </div>
+
+        <!-- Details Grid -->
+        <div class="meta-grid" *ngIf="job.status !== 'Hired' && job.status !== 'Rejected'">
+          <div class="meta-item"><i class="fas fa-map-marker-alt"></i> {{ job.location }}</div>
+          <div class="meta-item"><i class="fas fa-briefcase"></i> {{ job.workType }}</div>
+          <div class="meta-item"><i class="fas fa-wallet"></i> {{ job.salaryRange }}</div>
+        </div>
+
+        <!-- Interview Section (Only if scheduled and pending) -->
+        <div class="compact-interview-box" *ngIf="job.status === 'Interview Scheduled' && (!job.interviewCandidateStatus || job.interviewCandidateStatus === 'pending')">
+          <div class="iv-header">
+            <span class="iv-pulse"></span>
+            INTERVIEW INVITE
+          </div>
+          <div class="iv-content">
+            <div class="iv-time">
+              <i class="far fa-calendar-alt"></i> {{ job.interviewDate | date:'MMM d' }} • {{ job.interviewTime }}
+            </div>
+            <div class="iv-actions">
+              <button class="iv-btn accept" (click)="respondToInterview(job, 'accepted'); $event.stopPropagation()">Accept</button>
+              <button class="iv-btn decline" (click)="respondToInterview(job, 'rejected'); $event.stopPropagation()">Decline</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Actions Row -->
+        <div class="actions-row-compact">
+           <div class="status-wrap">
+              <span class="compact-status-badge" [ngClass]="getStatusClass(job.status)" *ngIf="job.status !== 'Hired' && job.status !== 'Rejected'">
+                 <ng-container [ngSwitch]="job.interviewCandidateStatus">
+                    <span *ngSwitchCase="'accepted'">Interview Confirmed</span>
+                    <span *ngSwitchCase="'rejected'" style="color: #ef4444;">Interview Cancelled</span>
+                    <span *ngSwitchDefault>{{ job.status }}</span>
+                 </ng-container>
+              </span>
+              <span class="joined-date" *ngIf="job.status === 'Hired'">Joined {{ (job.interviewDate || 'recently') | date:'MMM yyyy' }}</span>
+           </div>
+           <button class="btn-view-details" (click)="viewJobDetails(job); $event.stopPropagation()">
+              Details <i class="fas fa-arrow-right"></i>
+           </button>
+        </div>
+      </div>
+    </article>
+  </div>
+
+  <!-- ─── Compact Job Details Modal ─── -->
+  <div class="modal-backdrop fade-in" *ngIf="selectedJob">
+    <div class="modal-card fade-in-up compact-modal">
+
+      <!-- Modal Header -->
+      <div class="cm-header">
+        <div class="cm-header-text">
+          <span class="cm-subtitle">JOB DETAILS</span>
+          <h2 class="cm-title">{{ selectedJob.jobTitle }}</h2>
+        </div>
+        <button class="close-btn" (click)="closeJobDetails()"><i class="fas fa-times"></i></button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="cm-body">
+
+        <!-- Metrics Grid (2x2) -->
+        <div class="cm-metrics-grid">
+          <div class="cm-metric-card">
+            <div class="cm-metric-header"><i class="fas fa-building text-slate-400"></i> COMPANY</div>
+            <div class="cm-metric-value">{{ selectedJob.companyName }}</div>
+          </div>
+          <div class="cm-metric-card">
+            <div class="cm-metric-header"><i class="fas fa-map-marker-alt text-blue"></i> LOCATION</div>
+            <div class="cm-metric-value">{{ selectedJob.location || 'Remote' }}</div>
+          </div>
+          <div class="cm-metric-card">
+            <div class="cm-metric-header"><i class="fas fa-money-bill-wave text-green"></i> SALARY</div>
+            <div class="cm-metric-value">{{ selectedJob.salaryRange || 'Competitive' }}</div>
+          </div>
+          <div class="cm-metric-card">
+            <div class="cm-metric-header"><i class="fas fa-star text-amber"></i> MATCH SCORE</div>
+            <div class="cm-metric-value text-amber">{{ selectedJob.matchScore }}%</div>
+          </div>
+        </div>
+
+        <!-- Full Job Brief -->
+        <div class="cm-summary-box">
+          <div class="cm-summary-label">JOB BRIEF</div>
+          <p class="cm-summary-text">{{ selectedJob.description || 'No detailed description provided by the employer for
+            this role.' }}</p>
+        </div>
+
+        <!-- Skills Tags -->
+        <div class="section-tags" style="margin-top: 16px;">
+          <span class="tag matched" *ngFor="let skill of selectedJob.matchedSkills">{{ skill }}</span>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── Empty State (Refined) ─── -->
+  <div class="empty-state-premium fade-in-up" *ngIf="!isLoading && matchedJobs.length === 0">
+    <div class="empty-glass-card">
+      <div class="empty-visual">
+        <div class="pulse-orb"></div>
+        <i class="fas fa-radar"></i>
+      </div>
+      <h2>Scanning for matches...</h2>
+      <p>We're actively analyzing your profile against new job openings. When an employer shortlists you, it will appear
+        here instantly.</p>
+    </div>
+  </div>
+</div>

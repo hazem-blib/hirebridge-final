@@ -1,0 +1,164 @@
+<div class="layout" [class.sidebar-collapsed]="isSidebarCollapsed"
+  [class.employer-shell]="currentRole === 'employer' || currentRole === 'admin' || currentRole === 'candidate'"
+  (touchstart)="onEmployerTouchStart($event)" (touchend)="onEmployerTouchEnd($event)">
+  <aside class="sidebar" [class.collapsed]="isSidebarCollapsed">
+    <div class="logo">
+      <div class="logo-box">HB</div>
+      <div class="brand-copy" *ngIf="!isSidebarCollapsed">
+        <span class="logo-text">HireBridge</span>
+        <small>
+          {{
+          currentRole === 'employer'
+          ? 'Employer Platform'
+          : currentRole === 'client'
+          ? 'Client Portal'
+          : 'Career Platform'
+          }}
+        </small>
+      </div>
+    </div>
+
+    <ul class="sidebar-menu">
+      <li *ngFor="let item of menuItems" (click)="navigateFromSidebar(item)" [class.active]="isMenuItemActive(item)"
+        [routerLink]="item.link" [queryParams]="item.queryParams">
+        <i [class]="item.icon"></i>
+        <span>{{ item.label }}</span>
+      </li>
+    </ul>
+
+    <div class="sidebar-footer">
+      <button type="button" class="footer-link" *ngIf="!isSidebarCollapsed">
+        <i class="fas fa-circle-question"></i>
+        Support
+      </button>
+
+      <button type="button" class="footer-link logout-btn" (click)="logout()">
+        <i class="fas fa-arrow-right-from-bracket"></i>
+        <span *ngIf="!isSidebarCollapsed">Log Out</span>
+      </button>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button type="button" class="icon-btn menu-toggle" (click)="toggleSidebar()" aria-label="Toggle sidebar">
+          <i class="fas" [class.fa-bars]="isSidebarCollapsed" [class.fa-xmark]="!isSidebarCollapsed"></i>
+        </button>
+
+
+        <label class="topbar-search" aria-label="Search">
+          <i class="fas fa-search"></i>
+          <input type="search" [placeholder]="searchPlaceholder" />
+        </label>
+      </div>
+
+      <div class="topbar-actions">
+        <button class="icon-btn theme-toggle-btn premium-toggle" type="button" aria-label="Toggle Dark Mode"
+          (click)="toggleTheme()" [title]="isDarkMode ? 'Switch to Light' : 'Switch to Dark'">
+          <div class="toggle-glow"></div>
+          <i class="fas" [class.fa-moon]="!isDarkMode" [class.fa-sun]="isDarkMode"></i>
+        </button>
+        <button class="icon-btn" type="button" aria-label="Notifications">
+          <i class="fas fa-bell"></i>
+        </button>
+        <button class="icon-btn" type="button" aria-label="Help">
+          <i class="fas fa-question"></i>
+        </button>
+
+        <div class="user-menu" (click)="toggleMenu()">
+          <div class="user-info">
+            <span class="username">{{ userName }}</span>
+            <small>{{ portalLabel }}</small>
+          </div>
+
+          <div class="avatar-wrapper">
+            <span class="avatar-text">{{ userName.charAt(0) }}</span>
+          </div>
+
+          <div class="dropdown" *ngIf="menuOpen">
+            <button type="button" class="dropdown-link" (click)="logout()">
+              <i class="fas fa-arrow-right-from-bracket"></i>
+              Logout
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="content">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+
+  <a *ngIf="currentRole === 'employer' || currentRole === 'admin'" class="employer-mobile-fab"
+    [routerLink]="currentRole === 'employer' ? '/employer/jobs/new' : '/admin/interviews'" aria-label="Action">
+    <i class="fas fa-plus" *ngIf="currentRole === 'employer'"></i>
+    <i class="fas fa-calendar-alt" *ngIf="currentRole === 'admin'"></i>
+  </a>
+
+  <nav *ngIf="currentRole === 'employer'" class="employer-bottom-nav" aria-label="Employer mobile navigation">
+    <a routerLink="/employer/dashboard" [class.active]="router.url.includes('/employer/dashboard')">
+      <i class="fas fa-home"></i>
+      <span>Dashboard</span>
+    </a>
+    <a routerLink="/employer/jobs"
+      [class.active]="(router.url === '/employer/jobs' || router.url.includes('/employer/jobs')) && !router.url.includes('/interviews')">
+      <i class="fas fa-briefcase"></i>
+      <span>Requests</span>
+    </a>
+    <a routerLink="/employer/interviews"
+      [class.active]="router.url.includes('/employer/interviews') || router.url.includes('/interviews')">
+      <i class="fas fa-calendar-check"></i>
+      <span>Interviews</span>
+    </a>
+    <a routerLink="/employer/settings" [class.active]="router.url.includes('/employer/settings')">
+      <i class="fas fa-cog"></i>
+      <span>Settings</span>
+    </a>
+  </nav>
+
+  <nav *ngIf="currentRole === 'admin'" class="employer-bottom-nav" aria-label="Admin mobile navigation">
+    <a routerLink="/admin/dashboard" [class.active]="router.url.includes('/admin/dashboard')">
+      <i class="fas fa-home"></i>
+      <span>Dashboard</span>
+    </a>
+    <a routerLink="/admin/jobs" [class.active]="router.url.includes('/admin/jobs')">
+      <i class="fas fa-briefcase"></i>
+      <span>Jobs</span>
+    </a>
+    <a routerLink="/admin/candidates" [class.active]="router.url.includes('/admin/candidates')">
+      <i class="fas fa-users"></i>
+      <span>Candidates</span>
+    </a>
+    <a routerLink="/admin/companies" [class.active]="router.url.includes('/admin/companies')">
+      <i class="fas fa-building"></i>
+      <span>Companies</span>
+    </a>
+  </nav>
+
+  <nav *ngIf="currentRole === 'candidate'" class="employer-bottom-nav" aria-label="Candidate mobile navigation">
+    <a routerLink="/dashboard" [class.active]="router.url === '/dashboard'">
+      <i class="fas fa-home"></i>
+      <span>Dashboard</span>
+    </a>
+    <a routerLink="/matched-opportunities" [class.active]="router.url.includes('/matched-opportunities')">
+      <i class="fas fa-magic"></i>
+      <span>Matches</span>
+    </a>
+    <a routerLink="/applications" [class.active]="router.url.includes('/applications')">
+      <i class="fas fa-file-alt"></i>
+      <span>Applications</span>
+    </a>
+    <a routerLink="/profile" [class.active]="router.url.includes('/profile')">
+      <i class="fas fa-user"></i>
+      <span>Profile</span>
+    </a>
+    <a routerLink="/settings" [class.active]="router.url.includes('/settings')">
+      <i class="fas fa-cog"></i>
+      <span>Settings</span>
+    </a>
+  </nav>
+
+  <app-toast-outlet></app-toast-outlet>
+</div>

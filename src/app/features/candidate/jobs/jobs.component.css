@@ -1,0 +1,116 @@
+@import '../candidate-page.shared.css';
+
+.hero-actions {
+  margin-top: 18px;
+}
+
+.filters-card {
+  border: 1px solid rgba(215, 226, 240, 0.6);
+  border-radius: 16px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(10px);
+  display: grid;
+  gap: 10px;
+}
+
+.filters-card input,
+.filters-card select {
+  min-height: 44px;
+  border: 1px solid rgba(215, 226, 240, 0.8);
+  border-radius: 12px;
+  padding: 0 16px;
+  background: #ffffff;
+  color: #0f172a;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.filters-card input:focus,
+.filters-card select:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+  outline: none;
+}
+
+.jobs-grid {
+  display: grid;
+  grid-template-columns: minmax(280px, 1.8fr) minmax(100px, 0.7fr) minmax(110px, 0.8fr) minmax(130px, 0.8fr);
+  align-items: center;
+}
+
+.cb-table-row {
+  padding: 16px 20px !important;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  border-color: rgba(215, 226, 240, 0.6) !important;
+}
+
+.cb-table-row:hover {
+  transform: translateX(6px);
+  border-color: #cbdcf0 !important;
+  background: #f8fbff !important;
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.04);
+}
+
+.job-main strong {
+  color: #0f172a;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.job-main small {
+  color: #64748b;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.score {
+  color: #1762d4;
+  font-size: 1.1rem;
+  font-weight: 800;
+}
+
+/* KPI Icon Styles */
+.kpi-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.kpi-icon.blue { background: #eff6ff; color: #2563eb; border: 1px solid #dbeafe; }
+.kpi-icon.green { background: #f0fdf4; color: #16a34a; border: 1px solid #dcfce7; }
+.kpi-icon.amber { background: #fffbeb; color: #d97706; border: 1px solid #fef3c7; }
+.kpi-icon.red { background: #fef2f2; color: #dc2626; border: 1px solid #fee2e2; }
+
+.cb-kpi {
+  padding: 16px !important;
+  align-items: center !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.cb-kpi:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.06);
+}
+
+.cb-kpi h2 {
+  font-size: 1.5rem !important;
+  font-weight: 800 !important;
+}
+
+@media (max-width: 980px) {
+  .jobs-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  
+  .cb-table-row:hover {
+    transform: none;
+  }
+}

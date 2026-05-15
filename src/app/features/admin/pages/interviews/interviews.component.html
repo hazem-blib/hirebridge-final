@@ -1,0 +1,110 @@
+<section class="admin-page">
+  <!-- Executive Summary Hero -->
+  <!-- ─── New Executive Intelligence Hero (FIXED) ─── -->
+  <header class="dash-hero fade-in-up">
+    <div class="dash-hero-left">
+      <div class="hero-greeting">
+        <span class="badge-premium"><i class="fas fa-calendar-check"></i> Engagement Pipeline</span>
+        <h1>Interview <span class="text-gradient">Operations</span> Tracker</h1>
+        <p>Monitor scheduled sessions, pending requests, and completion rates for all active hiring cycles.</p>
+      </div>
+
+      <div class="hero-tags" style="margin-top: 24px;">
+        <span class="hero-tag"><i class="fas fa-video"></i> Remote Sessions</span>
+        <span class="hero-tag"><i class="fas fa-clock"></i> Feedback Loops</span>
+        <span class="hero-tag"><i class="fas fa-users"></i> Panel Sync</span>
+      </div>
+    </div>
+
+    <div class="hero-right-group">
+      <div class="health-orb-card">
+        <div class="health-orb">
+          <svg viewBox="0 0 36 36" class="circular-chart blue">
+            <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+            <path class="circle"
+              [attr.stroke-dasharray]="((completedCount() / (interviews().length || 1)) * 100) + ', 100'"
+              d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+            <text x="18" y="20.35" class="percentage">{{ ((completedCount() / (interviews().length || 1)) * 100) | number:'1.0-0' }}%</text>
+          </svg>
+        </div>
+        <div class="health-label">
+          <strong>Closure Rate</strong>
+          <small>{{ completedCount() }} sessions finalized</small>
+        </div>
+      </div>
+
+      <div class="hero-quick-actions">
+        <div class="mini-stats-grid">
+          <div class="mini-stat">
+            <span>Scheduled</span>
+            <strong>{{ scheduledCount() }}</strong>
+          </div>
+          <div class="mini-stat">
+            <span>Pending</span>
+            <strong>{{ pendingCount() }}</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <article class="db-panel fade-in-up delay-1">
+    <div class="db-table-premium" *ngIf="interviews().length; else noInterviews">
+      <div class="db-table-head interviews-grid">
+        <span>Candidate & Client</span>
+        <span>Target Role</span>
+        <span>Scheduled Date</span>
+        <span>Session Status</span>
+        <span class="text-right">Reference</span>
+      </div>
+
+      <div class="db-table-body">
+        @for (interview of interviews(); track interview.id; let i = $index) {
+        <article class="db-table-row-premium interviews-grid fade-in-up" [style.animation-delay]="(i * 0.05) + 's'">
+          <div class="candidate-cell-premium">
+            <div class="avatar-sm">{{ interview.candidateName.charAt(0) }}</div>
+            <div class="cell-content">
+              <strong>{{ interview.candidateName }}</strong>
+              <div class="meta-row-admin" style="display: flex; align-items: center; gap: 6px; font-size: 0.65rem; color: var(--text-muted);">
+                <span>{{ interview.companyName }}</span>
+                <span class="dot" style="width: 3px; height: 3px; background: #CBD5E1; border-radius: 50%;"></span>
+                <i class="far fa-clock"></i> {{ interview.createdAt | date:'HH:mm' }}
+              </div>
+            </div>
+          </div>
+
+          <div class="role-cell-premium">
+            <i class="fas fa-user-tag"></i>
+            <span>{{ interview.role }}</span>
+          </div>
+
+          <div class="date-cell-premium">
+            <i class="far fa-calendar-alt"></i>
+            <span>{{ interview.date | date:'mediumDate' }}</span>
+          </div>
+
+          <div class="status-cell">
+            <span [class]="getStatusClass(interview)">
+              {{ getStatusLabel(interview) }}
+            </span>
+          </div>
+
+          <div class="id-cell-premium text-right">
+            <span class="id-tag">#{{ interview.id.slice(-6) }}</span>
+          </div>
+        </article>
+        }
+      </div>
+    </div>
+
+    <ng-template #noInterviews>
+      <div class="empty-pipeline-state fade-in-up">
+        <div class="empty-icon-box"><i class="fas fa-calendar-check"></i></div>
+        <div class="empty-text-wrap">
+          <h3>Operations Tracker Dormant</h3>
+          <p>No interview operations recorded in the system. Scheduled sessions and feedback loops will be tracked here.</p>
+        </div>
+      </div>
+    </ng-template>
+  </article>
+</section>

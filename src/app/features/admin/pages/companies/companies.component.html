@@ -1,0 +1,160 @@
+<section class="admin-page">
+  <!-- Executive Summary Hero -->
+  <!-- ─── New Executive Intelligence Hero (FIXED) ─── -->
+  <header class="dash-hero fade-in-up">
+    <div class="dash-hero-left">
+      <div class="hero-greeting">
+        <span class="badge-premium"><i class="fas fa-building"></i> Portfolio Registry</span>
+        <h1>Client <span class="text-gradient">Portfolio</span> Intelligence</h1>
+        <p>Track active clients, open hiring load, and industry distribution for better recruitment planning.</p>
+      </div>
+
+      <div class="hero-tags" style="margin-top: 24px;">
+        <span class="hero-tag"><i class="fas fa-chart-pie"></i> Load Analysis</span>
+        <span class="hero-tag"><i class="fas fa-globe"></i> Market Sectors</span>
+        <span class="hero-tag"><i class="fas fa-shield-alt"></i> Verified Partners</span>
+      </div>
+    </div>
+
+    <div class="hero-right-group">
+      <div class="health-orb-card">
+        <div class="health-orb">
+          <svg viewBox="0 0 36 36" class="circular-chart blue">
+            <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+            <path class="circle"
+              [attr.stroke-dasharray]="((totalOpenRoles() / (companies().length * 5 || 1)) * 100) + ', 100'"
+              d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+            <text x="18" y="20.35" class="percentage">{{ ((totalOpenRoles() / (companies().length * 5 || 1)) * 100) |
+              number:'1.0-0' }}%</text>
+          </svg>
+        </div>
+        <div class="health-label">
+          <strong>Load Intensity</strong>
+          <small>{{ totalOpenRoles() }} active requests</small>
+        </div>
+      </div>
+
+      <div class="hero-quick-actions">
+        <div class="mini-stats-grid">
+          <div class="mini-stat">
+            <span>Total Clients</span>
+            <strong>{{ companies().length }}</strong>
+          </div>
+          <div class="mini-stat">
+            <span>Sectors</span>
+            <strong>{{ uniqueIndustries() }}</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <article class="db-panel fade-in-up delay-1">
+    <div class="db-table-premium" *ngIf="companies().length; else noCompanies">
+      <div class="db-table-head companies-grid">
+        <span>Strategic Client</span>
+        <span>Market Sector</span>
+        <span>Current Load</span>
+        <span class="text-right">Management</span>
+      </div>
+
+      <div class="db-table-body">
+        @for (company of companies(); track company.id; let i = $index) {
+        <article class="db-table-row-premium companies-grid fade-in-up" [style.animation-delay]="(i * 0.05) + 's'">
+          <div class="company-main-premium">
+            <div class="avatar-sm">{{ company.name.charAt(0) }}</div>
+            <div class="cell-content">
+              <strong>{{ company.name }}</strong>
+              <div class="meta-row-admin"
+                style="display: flex; align-items: center; gap: 6px; font-size: 0.65rem; color: var(--text-muted);">
+                <i class="far fa-calendar-alt"></i> {{ company.newestJobAt | date:'MMM d, HH:mm' }}
+                <span class="dot" style="width: 3px; height: 3px; background: #CBD5E1; border-radius: 50%;"></span>
+                <span class="id-tag">#{{ company.id.substring(0, 8) }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="sector-cell-premium">
+            <span class="industry-pill-exec">{{ company.industry }}</span>
+          </div>
+
+          <div class="load-cell-premium">
+            <strong>{{ company.openRoles }} Active Roles</strong>
+          </div>
+
+          <div class="action-cell-premium text-right">
+            <div class="btn-group-exec">
+              <button type="button" class="btn-icon-soft" title="Analytics" (click)="openCompanyJobs(company)">
+                <i class="fas fa-chart-pie"></i>
+              </button>
+              <button type="button" class="btn-exec-premium primary" (click)="openCompanyJobs(company)">
+                <span>View Pipeline</span>
+                <i class="fas fa-layer-group"></i>
+              </button>
+            </div>
+          </div>
+        </article>
+        }
+      </div>
+    </div>
+
+    <ng-template #noCompanies>
+      <div class="empty-pipeline-state fade-in-up">
+        <div class="empty-icon-box"><i class="fas fa-building"></i></div>
+        <div class="empty-text-wrap">
+          <h3>Portfolio Registry Empty</h3>
+          <p>No client organizations registered in the registry. Onboarded companies will be listed here for portfolio
+            management.</p>
+        </div>
+      </div>
+    </ng-template>
+  </article>
+
+  <!-- Jobs Modal -->
+  <div class="jobs-modal-backdrop" *ngIf="activeCompany() as company" (click)="closeCompanyJobs()">
+    <article class="jobs-modal-premium fade-in-up" (click)="$event.stopPropagation()">
+      <header class="modal-header-exec">
+        <div class="header-left">
+          <p class="db-eyebrow">Client Inventory</p>
+          <h3>{{ company.name }}</h3>
+        </div>
+        <button type="button" class="btn-close-exec" (click)="closeCompanyJobs()" title="Close">
+          <i class="fas fa-times"></i>
+        </button>
+      </header>
+
+      <div class="modal-body-exec" *ngIf="activeCompanyJobs().length; else noCompanyJobs">
+        <div class="modal-scroll-area">
+          @for (job of activeCompanyJobs(); track job.id; let i = $index) {
+          <article class="job-card-premium" [style.animation-delay]="(i * 0.05) + 's'">
+            <div class="job-info-exec">
+              <div class="job-avatar-exec">{{ job.title.charAt(0) }}</div>
+              <div class="job-details-exec">
+                <div class="job-title-row">
+                  <h4>{{ job.title }}</h4>
+                  <span class="status-pill-exec" [class]="job.status.toLowerCase()">{{ job.status }}</span>
+                </div>
+                <p class="job-meta-exec">
+                  <span><i class="fas fa-map-marker-alt"></i> {{ job.location }}</span>
+                  <span class="dot"></span>
+                  <span><i class="fas fa-briefcase"></i> {{ job.workType }}</span>
+                  <span class="dot"></span>
+                  <span><i class="fas fa-users"></i> {{ job.openRoles }} roles</span>
+                </p>
+              </div>
+            </div>
+            <button type="button" class="btn-exec-premium primary" (click)="viewJobDetails(job.id)">
+              <span>Details</span>
+              <i class="fas fa-chevron-right"></i>
+            </button>
+          </article>
+          }
+        </div>
+      </div>
+
+      <ng-template #noCompanyJobs>
+        <div class="db-empty">No active requests found for this client.</div>
+      </ng-template>
+    </article>
+  </div>
+</section>

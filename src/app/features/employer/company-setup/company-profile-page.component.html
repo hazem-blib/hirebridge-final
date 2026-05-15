@@ -1,0 +1,163 @@
+<div class="employer-dashboard" *ngIf="loading; else profileContent">
+  <div class="skeleton-wrapper fade-in-up" style="padding: 24px;">
+    <div class="skeleton-box skeleton-hero"></div>
+    <div class="skeleton-kpis">
+      <div class="skeleton-box skeleton-kpi"></div>
+      <div class="skeleton-box skeleton-kpi"></div>
+      <div class="skeleton-box skeleton-kpi"></div>
+      <div class="skeleton-box skeleton-kpi"></div>
+    </div>
+    <div class="skeleton-grid">
+      <div class="skeleton-box skeleton-panel"></div>
+      <div class="skeleton-box skeleton-panel"></div>
+    </div>
+  </div>
+</div>
+
+<ng-template #profileContent>
+  <div class="employer-dashboard" *ngIf="profile as company">
+    <!-- Executive Hero (Profile Style) -->
+    <header class="dash-hero fade-in-up">
+      <div class="dash-hero-left">
+        <div class="hero-greeting">
+          <div class="breadcrumb-premium">
+            <span>Employer Portal</span>
+            <i class="fas fa-chevron-right"></i>
+            <span>Brand Identity</span>
+          </div>
+          <h1>Company <span class="text-gradient">Profile</span></h1>
+          <p>Maintain your professional brand identity and presence across the recruitment platform.</p>
+        </div>
+        
+        <div class="mobile-hero-metrics">
+          <div><strong>{{ company.industry }}</strong><span>Industry</span></div>
+          <div><strong>95%</strong><span>Quality</span></div>
+        </div>
+      </div>
+
+      <div class="hero-right-group">
+        <!-- Brand Health Orb -->
+        <div class="health-orb-card">
+          <div class="health-orb">
+            <svg viewBox="0 0 36 36" class="circular-chart blue">
+              <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+              <path class="circle" stroke-dasharray="95, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+              <text x="18" y="20.35" class="percentage">95%</text>
+            </svg>
+          </div>
+          <div class="health-label">
+            <strong>Brand Quality</strong>
+            <small>Strong Identity</small>
+          </div>
+        </div>
+
+        <div class="hero-quick-actions">
+          <button (click)="save()" class="btn-action-card">
+            <i class="fas fa-sync-alt" [class.fa-spin]="saving"></i>
+            <span>Refresh</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <article *ngIf="message" class="success-toast fade-in">{{ message }}</article>
+
+    <div class="premium-grid-layout fade-in-up delay-1">
+      <section class="glass-panel main-review">
+        <header class="panel-header">
+          <div class="panel-title-row">
+            <div class="panel-icon-mini"><i class="fas fa-id-card" style="color: var(--primary);"></i></div>
+            <h2>Identity Details</h2>
+          </div>
+        </header>
+
+        <form (ngSubmit)="save()" class="premium-form">
+          <div class="form-grid-premium">
+            <!-- Brand Overview Box (Integrated Logo) -->
+            <div class="brand-overview-field full-w">
+               <div class="profile-avatar-premium">
+                 <img [src]="company.logo" *ngIf="company.logo" [alt]="company.name" (error)="company.logo = ''">
+                 <span *ngIf="!company.logo">{{ company.name.charAt(0).toUpperCase() }}</span>
+               </div>
+               <div class="brand-inputs">
+                  <div class="field-premium">
+                    <label>Company Name</label>
+                    <div class="input-wrap">
+                      <i class="fas fa-building"></i>
+                      <input type="text" name="name" [(ngModel)]="company.name" placeholder="Enter company name" />
+                    </div>
+                  </div>
+               </div>
+            </div>
+
+            <div class="field-premium">
+              <label>Industry</label>
+              <div class="input-wrap">
+                <i class="fas fa-industry"></i>
+                <input type="text" name="industry" [(ngModel)]="company.industry" placeholder="e.g. Technology" />
+              </div>
+            </div>
+
+            <div class="field-premium">
+              <label>Professional Email</label>
+              <div class="input-wrap">
+                <i class="fas fa-envelope"></i>
+                <input type="email" name="companyEmail" [(ngModel)]="company.companyEmail" placeholder="contact@company.com" />
+              </div>
+            </div>
+
+            <div class="field-premium">
+              <label>Website URL</label>
+              <div class="input-wrap">
+                <i class="fas fa-link"></i>
+                <input type="text" name="website" [(ngModel)]="company.website" placeholder="www.company.com" />
+              </div>
+            </div>
+
+            <div class="field-premium">
+              <label>Company Logo URL</label>
+              <div class="input-wrap">
+                <i class="fas fa-image"></i>
+                <input type="text" name="logo" [(ngModel)]="company.logo" placeholder="https://..." />
+              </div>
+            </div>
+          </div>
+
+          <div class="form-actions-premium">
+            <button type="submit" class="btn-premium primary sm" [disabled]="saving">
+              <i class="fas fa-save"></i>
+              <span>{{ saving ? 'Saving Changes...' : 'Update Identity' }}</span>
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <aside class="pipeline-sidebar">
+        <article class="bento-card">
+          <header class="panel-title-row">
+            <div class="panel-icon-mini"><i class="fas fa-rocket"></i></div>
+            <h2>Brand Quality</h2>
+          </header>
+          
+          <div class="branding-tip-box">
+             <div class="tip-visual">
+               <i class="fas fa-award"></i>
+             </div>
+             <p>A complete profile increases candidate response rates by up to <strong>40%</strong>.</p>
+          </div>
+        </article>
+
+        <article class="bento-card">
+          <header class="panel-title-row">
+            <div class="panel-icon-mini"><i class="fas fa-bolt"></i></div>
+            <h2>Quick Actions</h2>
+          </header>
+          <div class="link-intelligence-list">
+             <button class="link-item-premium" type="button"><i class="fas fa-external-link-alt"></i><span>View Public Page</span></button>
+             <button class="link-item-premium" type="button"><i class="fas fa-user-shield"></i><span>Team Security</span></button>
+          </div>
+        </article>
+      </aside>
+    </div>
+  </div>
+</ng-template>

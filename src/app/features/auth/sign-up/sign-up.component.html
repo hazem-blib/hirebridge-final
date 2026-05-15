@@ -1,0 +1,106 @@
+<div class="auth-shell">
+  <section class="brand-header">
+    <div class="brand-mark">HB</div>
+    <h1>HireBridge</h1>
+    <p>Enterprise hiring and career workflows redefined</p>
+  </section>
+
+  <section class="auth-card wide-card">
+    <div class="card-header">
+      <h2>Create account</h2>
+      <p>Set up your access and continue to the next step</p>
+    </div>
+
+    <div class="error-alert shake" *ngIf="errorMsg">
+      <div class="alert-icon"><i class="fas fa-circle-exclamation"></i></div>
+      <div class="alert-content">
+        <p>{{ errorMsg }}</p>
+      </div>
+      <button class="alert-close" (click)="clearError()"><i class="fas fa-times"></i></button>
+    </div>
+
+    <form (ngSubmit)="submit()" class="form two-column">
+      <div class="field-block full">
+        <label for="signup-name">Full Name</label>
+        <div class="field with-icon">
+          <input id="signup-name" placeholder="Your full name" [(ngModel)]="name" name="name" 
+            (blur)="onBlur('name')" (ngModelChange)="clearError()" [class.invalid-input]="touched.name && isEmpty(name)" />
+          <i class="fas fa-user"></i>
+        </div>
+        <div class="error" *ngIf="touched.name && isEmpty(name)">Full name is required</div>
+      </div>
+
+      <div class="field-block">
+        <label for="signup-email">Email</label>
+        <div class="field with-icon">
+          <input id="signup-email" type="email" placeholder="name@example.com" [(ngModel)]="email" name="email" 
+            (blur)="onBlur('email')" (ngModelChange)="clearError()" [class.invalid-input]="touched.email && isEmpty(email)" />
+          <i class="fas fa-envelope"></i>
+        </div>
+        <div class="error" *ngIf="touched.email && isEmpty(email)">Email is required</div>
+      </div>
+
+      <div class="field-block">
+        <label for="signup-phone">Phone Number</label>
+        <div class="field with-icon">
+          <input id="signup-phone" type="tel" placeholder="+20 100 000 0000" [(ngModel)]="phone" name="phone" 
+            (blur)="onBlur('phone')" (ngModelChange)="clearError()" (keydown)="onlyNumbers($event)"
+            [class.invalid-input]="touched.phone && isEmpty(phone)" />
+          <i class="fas fa-phone"></i>
+        </div>
+        <div class="error" *ngIf="touched.phone && isEmpty(phone)">Phone is required</div>
+      </div>
+
+      <div class="field-block">
+        <label for="signup-password">Password</label>
+        <div class="field with-icon">
+          <input id="signup-password" type="password" placeholder="Create a secure password" [(ngModel)]="password" name="password" 
+            (blur)="onBlur('password')" (ngModelChange)="clearError()" [class.invalid-input]="touched.password && (isEmpty(password) || password.length < 6)" />
+          <i class="fas fa-lock"></i>
+        </div>
+        <div class="error" *ngIf="touched.password && isEmpty(password)">Password is required</div>
+      </div>
+
+      <div class="field-block">
+        <label for="signup-confirm-password">Confirm Password</label>
+        <div class="field with-icon">
+          <input id="signup-confirm-password" type="password" placeholder="Repeat your password" [(ngModel)]="confirmPassword" name="confirmPassword" 
+            (blur)="onBlur('confirmPassword')" (ngModelChange)="clearError()" [class.invalid-input]="touched.confirmPassword && (isEmpty(confirmPassword) || password !== confirmPassword)" />
+          <i class="fas fa-shield-halved"></i>
+        </div>
+        <div class="error" *ngIf="touched.confirmPassword && isEmpty(confirmPassword)">Confirm your password</div>
+      </div>
+
+      <div class="field-block full" *ngIf="touched.confirmPassword && password !== confirmPassword">
+        <div class="error shake">Passwords do not match</div>
+      </div>
+
+      <div class="field-block full">
+        <button type="submit" class="primary-btn" [disabled]="loading || success" [class.btn-success]="success">
+          <span *ngIf="!loading && !success">Create Account <i class="fas fa-arrow-right"></i></span>
+          <span *ngIf="loading && !success" class="loading-content">
+            <i class="fas fa-circle-notch fa-spin"></i> Creating Account...
+          </span>
+          <span *ngIf="success" class="loading-content">
+            <i class="fas fa-check-circle"></i> Account Created!
+          </span>
+        </button>
+      </div>
+    </form>
+  </section>
+
+  <div class="auth-link-row">
+    <span>Already registered?</span>
+    <a routerLink="/login">Log in to your account</a>
+  </div>
+
+  <footer class="page-footer">
+    <span>&copy; 2026 HireBridge. All rights reserved.</span>
+    <nav>
+      <a href="#">Privacy Policy</a>
+      <a href="#">Terms of Service</a>
+      <a href="#">Security</a>
+      <a href="#">Contact Support</a>
+    </nav>
+  </footer>
+</div>

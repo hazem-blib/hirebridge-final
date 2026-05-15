@@ -1,0 +1,268 @@
+<section class="admin-page">
+  @if (isLoading()) {
+  <div class="skeleton-wrapper fade-in-up" style="padding: 24px;">
+    <div class="skeleton-box skeleton-hero" style="height: 200px; border-radius: 32px; margin-bottom: 32px;"></div>
+    <div class="skeleton-kpis"
+      style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 32px;">
+      <div class="skeleton-box skeleton-kpi" style="height: 120px; border-radius: 24px;"></div>
+      <div class="skeleton-box skeleton-kpi" style="height: 120px; border-radius: 24px;"></div>
+      <div class="skeleton-box skeleton-kpi" style="height: 120px; border-radius: 24px;"></div>
+    </div>
+    <div class="skeleton-panel" style="height: 400px; border-radius: 28px;"></div>
+  </div>
+  } @else {
+  <!-- ─── Executive Intelligence Hero ─── -->
+  <header class="dash-hero fade-in-up">
+    <div class="dash-hero-left">
+      <div class="hero-greeting">
+        <span class="badge-premium"><i class="fas fa-layer-group"></i> Strategic Inventory</span>
+        <h1>Strategic Inventory <span class="text-gradient">Hub</span></h1>
+        <p>Orchestrate hiring requests, optimize candidate matching, and monitor the entire lifecycle of operational recruitment excellence.</p>
+      </div>
+
+      <div class="hero-tags" style="margin-top: 24px;">
+        <span class="hero-tag"><i class="fas fa-bolt"></i> Focused Pipeline</span>
+        <span class="hero-tag"><i class="fas fa-bullseye"></i> Fast Matching</span>
+        <span class="hero-tag"><i class="fas fa-calendar-check"></i> Interview Ready</span>
+      </div>
+    </div>
+
+    <div class="hero-right-group">
+      <div class="health-orb-card">
+        <div class="health-orb">
+          <svg viewBox="0 0 36 36" class="circular-chart blue">
+            <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+            <path class="circle"
+              [attr.stroke-dasharray]="(openJobsCount() / ((jobs() || []).length || 1)) * 100 + ', 100'"
+              d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+            <text x="18" y="20.35" class="percentage">{{ (openJobsCount() / ((jobs() || []).length || 1)) * 100 | number:'1.0-0' }}%</text>
+          </svg>
+        </div>
+        <div class="health-label">
+          <strong>Active Efficiency</strong>
+          <small>{{ openJobsCount() }} requests in flow</small>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Premium Insight Grid -->
+  <section class="insights-row fade-in-up delay-1">
+    <article class="insight-card-modern">
+      <div class="card-icon-exec blue"><i class="fas fa-rocket"></i></div>
+      <div class="card-body">
+        <span class="card-label">Ready to process</span>
+        <div class="card-val-row">
+          <strong class="card-val">{{ openJobsCount() }}</strong>
+          <span class="card-trend"><i class="fas fa-chevron-right"></i></span>
+        </div>
+        <p class="card-desc">Active hiring requests</p>
+      </div>
+    </article>
+
+    <article class="insight-card-modern">
+      <div class="card-icon-exec violet"><i class="fas fa-check-double"></i></div>
+      <div class="card-body">
+        <span class="card-label">Under validation</span>
+        <div class="card-val-row">
+          <strong class="card-val">{{ reviewJobsCount() }}</strong>
+          <span class="card-trend"><i class="fas fa-circle-notch fa-spin" style="font-size: 0.6rem;"></i></span>
+        </div>
+        <p class="card-desc">Pending final review</p>
+      </div>
+    </article>
+
+    <article class="insight-card-modern">
+      <div class="card-icon-exec amber"><i class="fas fa-chart-line"></i></div>
+      <div class="card-body">
+        <span class="card-label">Pipeline load</span>
+        <div class="card-val-row">
+          <strong class="card-val">{{ candidates().length }}</strong>
+          <span class="card-trend up">+12%</span>
+        </div>
+        <p class="card-desc">Est. candidate capacity</p>
+      </div>
+    </article>
+  </section>
+
+  <!-- Main Request Panel -->
+  <article class="db-panel fade-in-up delay-2">
+    <div class="panel-section-header">
+      <div class="title-with-badge">
+        <h2>Active Recruitment Pipeline</h2>
+        <span class="count-badge blue">{{ openJobsCount() }} Active Roles</span>
+      </div>
+    </div>
+
+  <!-- ─── Unified Intelligence Panel ─── -->
+  <div class="db-intelligence-panel fade-in-up">
+    <!-- Panel Header -->
+    <header class="panel-header-exec">
+      <div class="header-col" style="flex: 1.5;">Hiring Opportunity</div>
+      <div class="header-col" style="flex: 1;">Strategic Context</div>
+      <div class="header-col" style="flex: 1.2;">Pipeline Load</div>
+      <div class="header-col" style="flex: 1.5; text-align: right;">Status & Strategic Actions</div>
+    </header>
+
+    <div class="panel-body-exec">
+      @for (job of openJobs(); track job.id; let i = $index) {
+      <article class="intel-capsule-unified" [style.animation-delay]="(i * 0.05) + 's'" (click)="openDetails(job)">
+        <!-- Profile Column -->
+        <div class="intel-col profile-col">
+          <div class="intel-avatar">{{ job.title.charAt(0) }}</div>
+          <div class="intel-title-wrap">
+            <span class="intel-eyebrow">Strategic Priority</span>
+            <h3>{{ job.title }}</h3>
+            <div class="intel-meta-tags">
+              <span class="tag-glass"><i class="fas fa-briefcase"></i> {{ job.minExperience }}Y</span>
+              <span class="tag-glass"><i class="far fa-clock"></i> {{ job.requestedAt | date:'MMM d, HH:mm' }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Context Column -->
+        <div class="intel-col context-col">
+          <div class="context-item">
+            <div class="icon-orb"><i class="fas fa-building"></i></div>
+            <div class="context-text">
+              <small>Client Partner</small>
+              <strong>{{ job.company }}</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pulse Column -->
+        <div class="intel-col pulse-col">
+          <div class="pulse-box-unified">
+            <div class="pulse-header">
+              <span>Strategic Match</span>
+              <strong>{{ 80 + (i * 3) }}%</strong>
+            </div>
+            <div class="pulse-track">
+              <div class="pulse-bar" [style.width.%]="80 + (i * 3)"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Actions Hub -->
+        <div class="intel-col actions-col">
+          <div class="intel-status">
+            <span class="status-pill-premium" [class]="job.status.toLowerCase()">
+              <span class="status-dot"></span>
+              {{ job.status }}
+            </span>
+          </div>
+
+          <div class="intel-actions">
+            <button type="button" class="btn-intel-secondary" (click)="$event.stopPropagation(); openShortlist(job)"
+              title="Shortlist Candidates">
+              <i class="fas fa-user-plus"></i>
+            </button>
+            <button type="button" class="btn-intel-primary" (click)="$event.stopPropagation(); openDetails(job)">
+              <span>Details</span>
+              <i class="fas fa-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+      </article>
+      }
+    </div>
+
+    @if (openJobs().length === 0) {
+    <div class="empty-pipeline-state fade-in-up" style="border: none; background: transparent;">
+      <div class="empty-icon-box"><i class="fas fa-layer-group"></i></div>
+      <div class="empty-text-wrap">
+        <h3>Strategic Inventory Empty</h3>
+        <p>No active hiring requests found in the system.</p>
+      </div>
+    </div>
+    }
+  </div>
+
+    <ng-template #emptyJobs>
+      <div class="empty-pipeline-state fade-in-up">
+        <div class="empty-icon-box"><i class="fas fa-layer-group"></i></div>
+        <div class="empty-text-wrap">
+          <h3>Strategic Inventory Empty</h3>
+          <p>No active hiring requests found in the system. New requests from companies will appear here for processing.</p>
+        </div>
+      </div>
+    </ng-template>
+
+    <!-- Closed Jobs Section -->
+    @if (closedJobs().length) {
+      <div class="panel-section-header mt-40">
+        <div class="title-with-badge">
+          <h2>Closed & Archived</h2>
+          <span class="count-badge grey">{{ closedJobs().length }} Roles</span>
+        </div>
+      </div>
+
+      <!-- Unified Archived Panel -->
+      <div class="db-intelligence-panel archived-panel fade-in-up">
+        <header class="panel-header-exec">
+          <div class="header-col" style="flex: 1.5;">Archived Opportunity</div>
+          <div class="header-col" style="flex: 1;">Strategic Context</div>
+          <div class="header-col" style="flex: 1.2;">Lifecycle Status</div>
+          <div class="header-col" style="flex: 1.5; text-align: right;">History & Analysis</div>
+        </header>
+
+        <div class="panel-body-exec">
+          @for (job of closedJobs(); track job.id; let i = $index) {
+          <article class="intel-capsule-unified archived" [style.animation-delay]="(i * 0.05) + 's'" (click)="openDetails(job)">
+            <div class="intel-col profile-col">
+              <div class="intel-avatar grey">{{ job.title.charAt(0) }}</div>
+              <div class="intel-title-wrap">
+                <span class="intel-eyebrow">Archived Record</span>
+                <h3>{{ job.title }}</h3>
+                <div class="intel-meta-tags">
+                  <span class="tag-glass">{{ job.company }}</span>
+                  <span class="tag-glass"><i class="far fa-calendar-alt"></i> Requested {{ job.requestedAt | date:'MMM d, y' }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="intel-col context-col">
+              <div class="context-item">
+                <div class="icon-orb"><i class="fas fa-location-dot"></i></div>
+                <div class="context-text">
+                  <small>Location</small>
+                  <strong>{{ job.location || 'Remote' }}</strong>
+                </div>
+              </div>
+            </div>
+
+            <div class="intel-col pulse-col" style="opacity: 0.4;">
+              <div class="pulse-box-unified">
+                <div class="pulse-header">
+                  <span>Lifecycle Complete</span>
+                  <i class="fas fa-check-circle" style="color: var(--text-muted);"></i>
+                </div>
+                <div class="pulse-track">
+                  <div class="pulse-bar" style="width: 100%; background: var(--text-muted); opacity: 0.3;"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="intel-col actions-col">
+              <div class="intel-status">
+                <span class="status-pill-premium closed">
+                  <span class="status-dot"></span>
+                  ARCHIVED
+                </span>
+              </div>
+              <div class="intel-actions">
+                <button type="button" class="btn-intel-secondary" (click)="$event.stopPropagation(); openDetails(job)"
+                  title="View History">
+                  <i class="fas fa-history"></i>
+                </button>
+              </div>
+            </div>
+          </article>
+          }
+        </div>
+      </div>
+    }
+  </article>
+  }
+</section>

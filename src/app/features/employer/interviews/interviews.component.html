@@ -1,0 +1,556 @@
+<div class="employer-dashboard">
+  @if (loading) {
+  <div class="skeleton-wrapper fade-in-up" style="padding: 24px;">
+    <div class="skeleton-box skeleton-hero"></div>
+    <div class="skeleton-kpis">
+      <div class="skeleton-box skeleton-kpi"></div>
+      <div class="skeleton-box skeleton-kpi"></div>
+      <div class="skeleton-box skeleton-kpi"></div>
+      <div class="skeleton-box skeleton-kpi"></div>
+    </div>
+    <div class="skeleton-grid">
+      <div class="skeleton-box skeleton-panel"></div>
+      <div class="skeleton-box skeleton-panel"></div>
+    </div>
+  </div>
+  } @else {
+  <!-- 1. Job Selection View (Global List) -->
+  <ng-container *ngIf="viewMode === 'list'">
+    <header class="dash-hero fade-in-up">
+      <div class="dash-hero-left">
+        <div class="hero-greeting">
+          <div class="breadcrumb-premium">
+            <span>Recruitment Intelligence</span>
+            <i class="fas fa-chevron-right"></i>
+            <span>Interview Hub</span>
+          </div>
+          <h1>Interview <span class="text-gradient">Hub</span></h1>
+          <p>Select a hiring request to manage its specific interview pipeline and candidate loops.</p>
+        </div>
+      </div>
+
+      <div class="hero-right-group">
+        <div class="health-orb-card">
+          <div class="health-orb">
+            <svg viewBox="0 0 36 36" class="circular-chart blue">
+              <path class="circle-bg"
+                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+              <path class="circle" [attr.stroke-dasharray]="pipelineHealthPercent + ', 100'"
+                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+              <text x="18" y="20.35" class="percentage">{{ allJobs.length }}</text>
+            </svg>
+          </div>
+          <div class="health-label">
+            <strong>Active Requests</strong>
+            <small>Global Pipeline</small>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <section class="job-selection-grid fade-in-up delay-1" *ngIf="sortedJobs.length; else emptyInterviewHub">
+      <div class="job-selection-card glass-panel" *ngFor="let j of sortedJobs"
+        [routerLink]="['/employer/jobs', j.id, 'interviews']">
+        <div class="job-selection-icon blue-soft">
+          <i class="fas fa-user-tie"></i>
+        </div>
+        <div class="job-selection-info">
+          <h3>{{ j.title }}</h3>
+          <p>{{ j.department }} • {{ j.location }}</p>
+          <div class="job-selection-stats">
+            <div class="selection-stat-pill" title="Matched Candidates">
+              <i class="fas fa-users-viewfinder"></i>
+              <strong>{{ getMatchedCandidatesForJob(j.id) }}</strong>
+            </div>
+            <div class="selection-stat-pill" title="Scheduled Interviews">
+              <i class="fas fa-calendar-check"></i>
+              <strong>{{ getInterviewCount(j.id) }}</strong>
+            </div>
+          </div>
+        </div>
+        <div class="job-selection-action">
+          <i class="fas fa-arrow-right"></i>
+        </div>
+      </div>
+    </section>
+    <ng-template #emptyInterviewHub>
+      <div class="empty-pipeline-state fade-in-up">
+        <div class="empty-icon-box blue"><i class="fas fa-calendar-check"></i></div>
+        <div class="empty-text-wrap">
+          <h3>Interview Hub Dormant</h3>
+          <p>No active recruitment pipelines found. Submit a request to start scheduling interviews.</p>
+        </div>
+        <button routerLink="/employer/jobs/new" class="btn-premium primary sm">
+          <i class="fas fa-plus"></i>
+          <span>Submit Request</span>
+        </button>
+      </div>
+    </ng-template>
+  </ng-container> <!-- 2. Interview Management View (Specific Job) -->
+  <ng-container *ngIf="viewMode === 'management'">
+    <header class="dash-hero fade-in-up">
+      <div class="dash-hero-left">
+        <div class="hero-greeting">
+          <div class="breadcrumb-premium" (click)="resetView()">
+            <span class="clickable-crumb"><i class="fas fa-terminal"></i> Interview Hub</span>
+            <i class="fas fa-chevron-right"></i>
+            <span>{{ currentJob?.title || 'Management' }}</span>
+          </div>
+          <h1><span class="text-gradient">{{ currentJob?.title }}</span></h1>
+          <p>Tracking candidate loops and performance for this specific request.</p>
+
+          <div class="hero-tags-premium" *ngIf="currentJob">
+            <span class="tag-pill-premium" *ngIf="passedCount > 0"><i class="fas fa-star"></i> High Sentiment</span>
+            <span class="tag-pill-premium"><i class="fas fa-users"></i> {{ currentJob.openRoles }} Roles</span>
+            <span class="tag-pill-premium"><i class="fas fa-map-marker-alt"></i> {{ currentJob.location }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-right-group">
+        <div class="health-orb-card">
+          <div class="health-orb">
+            <svg viewBox="0 0 36 36" class="circular-chart blue">
+              <path class="circle-bg"
+                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+              <path class="circle" [attr.stroke-dasharray]="animatedHealthPercent + ', 100'"
+                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+              <text x="18" y="20.35" class="percentage">{{ animatedHealthPercent }}%</text>
+            </svg>
+          </div>
+          <div class="health-label">
+            <strong>Pipeline Health</strong>
+            <small>Interview Quality</small>
+          </div>
+        </div>
+        <div class="hero-quick-actions">
+          <button (click)="toggleRequestDrawer()" class="btn-action-card">
+            <i class="fas fa-shuffle"></i><span>Switch Pipeline</span>
+          </button>
+          <button (click)="resetView()" class="btn-action-card">
+            <i class="fas fa-layer-group"></i><span>All Hubs</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- KPI Stats -->
+    <section class="premium-kpis fade-in-up delay-1">
+      <article class="kpi-intelligence-card">
+        <div class="kpi-icon blue"><i class="fas fa-calendar-check"></i></div>
+        <div class="kpi-content">
+          <span class="kpi-label">Scheduled</span>
+          <div class="kpi-val-row">
+            <h3>{{ upcomingCount }}</h3>
+            <span class="trend-pos"><i class="fas fa-clock"></i> Live</span>
+          </div>
+          <p>Confirmed Sessions</p>
+        </div>
+      </article>
+
+      <article class="kpi-intelligence-card">
+        <div class="kpi-icon cyan"><i class="fas fa-spinner fa-spin-slow"></i></div>
+        <div class="kpi-content">
+          <span class="kpi-label">In Process</span>
+          <div class="kpi-val-row">
+            <h3>{{ inProgressCount }}</h3>
+            <span class="trend-neutral">Active</span>
+          </div>
+          <p>Candidate Loops</p>
+        </div>
+      </article>
+
+      <article class="kpi-intelligence-card">
+        <div class="kpi-icon amber"><i class="fas fa-comments"></i></div>
+        <div class="kpi-content">
+          <span class="kpi-label">Feedback</span>
+          <div class="kpi-val-row">
+            <h3>{{ feedbackPendingCount }}</h3>
+            <span class="trend-warn">Pending</span>
+          </div>
+          <p>Decision Required</p>
+        </div>
+      </article>
+
+      <article class="kpi-intelligence-card">
+        <div class="kpi-icon success"><i class="fas fa-award"></i></div>
+        <div class="kpi-content">
+          <span class="kpi-label">Qualified</span>
+          <div class="kpi-val-row">
+            <h3>{{ passedCount }}</h3>
+            <span class="trend-pos">Ready</span>
+          </div>
+          <p>Final Stage</p>
+        </div>
+      </article>
+    </section>
+
+    <div class="premium-grid-layout fade-in-up delay-2">
+      <section class="glass-panel main-pipeline">
+        <header class="panel-header">
+          <div class="panel-title-row">
+            <div class="panel-icon-mini"><i class="fas fa-calendar-days" style="color: var(--primary);"></i></div>
+            <h2>Interview Pipeline</h2>
+            <span class="count-pill-premium">{{ filteredInterviews.length }} Sessions</span>
+          </div>
+          <div class="panel-actions-hub">
+            <div class="hub-search">
+              <i class="fas fa-search"></i>
+              <input type="text" [(ngModel)]="searchTerm" placeholder="Search candidate..." />
+            </div>
+            <div class="hub-filter">
+              <i class="fas fa-filter"></i>
+              <select [(ngModel)]="statusFilter">
+                <option value="all">All Status</option>
+                <option value="scheduled">Scheduled</option>
+                <option value="completed">Completed</option>
+                <option value="cancelled">Cancelled</option>
+              </select>
+            </div>
+          </div>
+        </header>
+
+        <div class="sessions-container">
+          <div class="sessions-header">
+            <div class="col-cand">Candidate</div>
+            <div class="col-eval">Evaluation</div>
+            <div class="col-time">Schedule</div>
+            <div class="col-stat">Status</div>
+            <div class="col-act">Actions</div>
+          </div>
+
+          <div class="sessions-list" *ngIf="filteredInterviews.length; else emptyInterviews">
+            <div class="session-row" *ngFor="let item of filteredInterviews" (click)="openInterviewDetails(item)">
+              <div class="col-cand">
+                <div class="candidate-pill">
+                  <div class="cand-avatar-mini">{{ getInitials(item.candidateName) }}</div>
+                  <div class="cand-meta">
+                    <strong>{{ item.candidateName }}</strong>
+                    <div class="meta-row-premium">
+                      <small><i class="fas fa-video"></i> {{ item.type }}</small>
+                      <span class="meta-sep">•</span>
+                      <small><i class="fas fa-user-tie"></i> {{ item.interviewerName || 'Unassigned' }}</small>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-eval">
+                <div class="evaluation-pill">
+                  <span [class]="getOutcomeBadgeClass(item)">
+                    {{ getOutcomeLabel(item) }}
+                  </span>
+                </div>
+              </div>
+              <div class="col-time">
+                <div class="time-stack">
+                  <div class="date-line"><strong>{{ item.date | date:'MMM d' }}</strong></div>
+                  <div class="time-line"><i class="far fa-clock"></i> {{ item.time }}</div>
+                </div>
+              </div>
+              <div class="col-stat">
+                <span [class]="getStatusBadgeClass(item)">{{ getStatusLabel(item) }}</span>
+              </div>
+              <div class="col-act">
+                <div class="integrated-action-hub">
+                  <button class="hub-btn view" (click)="openInterviewDetails(item)" title="Details">
+                    <i class="fas fa-circle-info"></i>
+                  </button>
+                  <ng-container *ngIf="item.candidateStatus !== 'rejected' && !item.probationStarted">
+                    <button class="hub-btn success" (click)="setInterviewOutcome(item, 'passed')"
+                      *ngIf="item.status !== 'completed' || item.outcome === 'pending'"
+                      [disabled]="!canTakeDecision(item)"
+                      [title]="canTakeDecision(item) ? 'Mark Passed' : 'Waiting for candidate to accept interview'">
+                      <i class="fas fa-user-check"></i>
+                    </button>
+                    <button class="hub-btn danger" (click)="cancelInterview(item.id)"
+                      [disabled]="item.status === 'cancelled' || item.status === 'completed'">
+                      <i class="fas fa-ban"></i>
+                    </button>
+                  </ng-container>
+                  <div class="status-icon-mini hired" *ngIf="item.probationStarted" title="Candidate Hired">
+                    <i class="fas fa-award"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <ng-template #emptyInterviews>
+            <div class="empty-pipeline-state fade-in-up">
+              <div class="empty-icon-box amber">
+                <i class="fas fa-calendar-plus"></i>
+              </div>
+              <div class="empty-text-wrap">
+                <h3>Pipeline Dormant</h3>
+                <p>No active sessions found. Initiate your recruitment loop by matching candidates from the Review Hub.</p>
+              </div>
+              <div class="empty-actions">
+                <button (click)="openCandidateInReview({jobId: jobId || '', applicantId: 'all'})"
+                  class="btn-premium primary sm">
+                  <i class="fas fa-users-viewfinder"></i><span>Review Candidates</span>
+                </button>
+              </div>
+            </div>
+          </ng-template>
+        </div>
+      </section>
+
+      <aside class="pipeline-sidebar">
+        <article class="bento-card sidebar-intelligence">
+          <header class="panel-header">
+            <div class="panel-title-row">
+              <i class="fas fa-gavel panel-icon amber"></i>
+              <h2>Final Decisions</h2>
+            </div>
+          </header>
+
+          <div class="decision-intelligence-queue" *ngIf="decisionQueue.length; else emptyQueue">
+            <div class="decision-card-premium" *ngFor="let item of decisionQueue" (click)="openCandidateInReview(item)">
+              <div class="q-left">
+                <div class="q-avatar-box">
+                  {{ getInitials(item.candidateName) }}
+                  <div class="q-status-dot" [class.hired]="item.probationStarted"></div>
+                </div>
+                <div class="q-details">
+                  <div class="q-name-row">
+                    <strong>{{ item.candidateName }}</strong>
+                    <span class="hired-badge-mini" *ngIf="item.probationStarted">HIRED</span>
+                  </div>
+                  <p>{{ getJobTitle(item.jobId) }}</p>
+                </div>
+              </div>
+              <button class="q-action-btn"><i class="fas fa-chevron-right"></i></button>
+            </div>
+          </div>
+          <ng-template #emptyQueue>
+            <div class="empty-mini-intelligence">
+              <div class="mini-glow-icon amber"><i class="fas fa-inbox-stack"></i></div>
+              <p>No decisions pending at this stage.</p>
+            </div>
+          </ng-template>
+        </article>
+
+        <!-- Success Board Section -->
+        <article class="bento-card sidebar-intelligence success-card" *ngIf="successBoard.length">
+          <header class="panel-header">
+            <div class="panel-title-row">
+              <i class="fas fa-award panel-icon green"></i>
+              <h2>Success Board</h2>
+            </div>
+          </header>
+          <div class="success-intelligence-list">
+            <div class="success-card-mini" *ngFor="let item of successBoard">
+              <div class="s-left">
+                <div class="s-avatar-box">
+                  {{ getInitials(item.candidateName) }}
+                </div>
+                <div class="s-details">
+                  <strong>{{ item.candidateName }}</strong>
+                  <p>Officially Hired</p>
+                </div>
+              </div>
+              <div class="s-check-icon"><i class="fas fa-circle-check"></i></div>
+            </div>
+          </div>
+        </article>
+
+        <article class="bento-card sidebar-intelligence">
+          <header class="panel-header">
+            <div class="panel-title-row">
+              <i class="fas fa-chart-line panel-icon cyan"></i>
+              <h2>Interviewer Load</h2>
+            </div>
+          </header>
+
+          <div class="load-intelligence-list" *ngIf="interviewerLoad.length; else emptyLoad">
+            <div class="load-item-premium" *ngFor="let p of interviewerLoad">
+              <div class="load-meta-row">
+                <span class="load-name">{{ p.name }}</span>
+                <span class="load-count"><strong>{{ p.count }}</strong> active</span>
+              </div>
+              <div class="metric-bar">
+                <div class="metric-bar-fill blue" [style.width.%]="(p.count / 10) * 100"></div>
+              </div>
+            </div>
+          </div>
+          <ng-template #emptyLoad>
+            <div class="empty-mini-intelligence">
+              <div class="mini-glow-icon cyan"><i class="fas fa-users-slash"></i></div>
+              <p>No interviewer activity detected.</p>
+            </div>
+          </ng-template>
+        </article>
+      </aside>
+    </div>
+  </ng-container>
+
+  <!-- Candidate Details Modal (Popup) -->
+  <div class="premium-modal-backdrop fade-in" *ngIf="selectedInterview" (click)="trackInterviewDetailsBackdrop($event)">
+    <!-- Premium Modal Card -->
+    <div class="premium-modal-card fade-in-up" (click)="$event.stopPropagation()">
+      <button class="modal-close-btn-top" (click)="closeInterviewDetails()" title="Close details">
+        <i class="fas fa-times"></i>
+      </button>
+
+      <!-- Modal Header -->
+      <div class="modal-premium-header">
+        <div class="modal-avatar-large">
+          {{ getInitials(selectedInterview.candidateName) }}
+        </div>
+        <div class="modal-header-info">
+          <h2>{{ selectedInterview.candidateName }}</h2>
+          <p>Job Opportunity • {{ selectedInterview.location || 'Onsite' }}</p>
+        </div>
+      </div>
+
+      <div class="modal-premium-body">
+        <div class="info-grid-premium">
+          <div class="info-item-box">
+            <label>Interview Time</label>
+            <strong><i class="fas fa-calendar-alt"></i> {{ selectedInterview.date | date:'fullDate' }} at {{
+              selectedInterview.time }}</strong>
+          </div>
+          <div class="info-item-box">
+            <label>Status</label>
+            <span class="status-pill-premium"
+              [class]="selectedInterview.probationStarted ? 'hired' : (selectedInterview.candidateStatus === 'rejected' ? 'cancelled' : selectedInterview.status.toLowerCase())">
+              {{ selectedInterview.probationStarted ? 'Hired' : getStatusLabel(selectedInterview) }}
+            </span>
+          </div>
+          <div class="info-item-box">
+            <label>Location / Link</label>
+            <strong><i class="fas fa-map-marker-alt"></i> {{ selectedInterview.location }}</strong>
+          </div>
+          <div class="info-item-box">
+            <label>Interviewer</label>
+            <strong><i class="fas fa-user-tie"></i> {{ selectedInterview.interviewerName }}</strong>
+          </div>
+        </div>
+
+        <div class="modal-section-divider"></div>
+
+        <div class="notes-section-premium">
+          <h3><i class="fas fa-sticky-note"></i> Interviewer Notes & Brief</h3>
+          <p class="premium-notes-text">
+            {{ selectedInterview.notes || 'No specific notes provided for this interview loop.' }}
+          </p>
+        </div>
+
+        <!-- Evaluation Status Badge -->
+        <div class="outcome-badge-large" *ngIf="selectedInterview.outcome && selectedInterview.outcome !== 'pending'"
+          [class.passed]="selectedInterview.outcome === 'passed'"
+          [class.failed]="selectedInterview.outcome === 'failed'" [class.hired]="selectedInterview.probationStarted">
+          <i class="fas"
+            [ngClass]="selectedInterview.probationStarted ? 'fa-award' : (selectedInterview.outcome === 'passed' ? 'fa-check-circle' : 'fa-times-circle')"></i>
+          Current Evaluation: {{ selectedInterview.probationStarted ? 'Hired & Onboarding' : (selectedInterview.outcome
+          === 'passed' ? 'Qualified for Hire' : 'Rejected') }}
+        </div>
+
+        <!-- Candidate Acceptance Notice -->
+        <div class="outcome-badge-large warning-light" *ngIf="!canTakeDecision(selectedInterview) && !isRejected">
+          <i class="fas fa-clock fa-spin-slow"></i>
+          Waiting for candidate to accept interview invitation...
+        </div>
+
+        <!-- Candidate Declined Notice -->
+        <div class="outcome-badge-large failed" *ngIf="selectedInterview.candidateStatus === 'rejected'">
+          <i class="fas fa-user-times"></i>
+          Candidate has declined this interview invitation.
+        </div>
+      </div>
+
+      <!-- Modal Footer Actions -->
+      <div class="modal-premium-footer">
+        <button class="btn-premium secondary" (click)="closeInterviewDetails()">
+          Close
+        </button>
+
+        <div class="modal-decision-actions" *ngIf="!isRejected && selectedInterview.candidateStatus !== 'rejected'; else rejectedState">
+          <button class="btn-premium secondary danger-text" *ngIf="!isHired && selectedInterview.outcome !== 'passed'"
+            [disabled]="!canTakeDecision(selectedInterview)"
+            (click)="setInterviewOutcome(selectedInterview, 'failed')">
+            <i class="fas fa-user-times"></i> Reject
+          </button>
+  
+          <button class="btn-premium success-bg" *ngIf="selectedInterview.outcome !== 'passed'"
+            [disabled]="!canTakeDecision(selectedInterview)"
+            (click)="setInterviewOutcome(selectedInterview, 'passed')">
+            <i class="fas fa-check"></i> Mark Passed
+          </button>
+  
+          <button class="btn-premium success-bg" *ngIf="selectedInterview.outcome === 'passed' && !isHired"
+            [disabled]="!canTakeDecision(selectedInterview)"
+            (click)="confirmHire(selectedInterview)">
+            <i class="fas fa-award"></i> Confirm Final Hire
+          </button>
+
+          <button class="btn-premium success-bg" *ngIf="isHired" disabled style="opacity: 0.8; cursor: default;">
+            <i class="fas fa-check-circle"></i> Already Hired
+          </button>
+
+          <button class="btn-premium primary" (click)="openCandidateInReview(selectedInterview)">
+            <i class="fas fa-external-link-alt"></i> Full Review Hub
+          </button>
+        </div>
+
+        <!-- Final State Indicator if Rejected -->
+        <ng-template #rejectedState>
+          <div class="modal-decision-actions">
+            <button class="btn-premium primary" (click)="openCandidateInReview(selectedInterview)">
+              <i class="fas fa-external-link-alt"></i> View in Review Hub
+            </button>
+            <div class="final-status-text danger">
+              <i class="fas fa-times-circle"></i> 
+              {{ selectedInterview.candidateStatus === 'rejected' ? 'Candidate declined this invitation.' : 'This candidate has been rejected.' }}
+            </div>
+          </div>
+        </ng-template>
+      </div>
+    </div>
+  </div>
+  <!-- Request Selection Drawer -->
+  <div class="request-drawer-backdrop" *ngIf="isRequestDrawerOpen" (click)="toggleRequestDrawer()">
+    <div class="request-drawer" (click)="$event.stopPropagation()">
+      <header class="drawer-header">
+        <div class="drawer-header-copy">
+          <h2>Select Hiring Request</h2>
+          <p>Switch between your active recruitment pipelines</p>
+        </div>
+        <button class="btn-close-drawer" (click)="toggleRequestDrawer()">
+          <i class="fas fa-times"></i>
+        </button>
+      </header>
+
+      <div class="drawer-content">
+        <div *ngFor="let j of sortedJobs" [routerLink]="['/employer/jobs', j.id, 'interviews']"
+          (click)="isRequestDrawerOpen = false" [class.active]="jobId && j.id == jobId" class="drawer-job-card">
+          <div class="job-card-main">
+            <div class="job-card-icon" [class.active]="jobId && j.id == jobId">
+              <i class="fas fa-user-tie"></i>
+            </div>
+            <div class="job-card-info">
+              <h4>{{ j.title }}</h4>
+              <p>{{ j.department }} • {{ j.openRoles }} Roles</p>
+            </div>
+            <div class="job-card-stat" *ngIf="getMatchedCandidatesForJob(j.id) > 0">
+              <span>{{ getMatchedCandidatesForJob(j.id) }}</span>
+            </div>
+          </div>
+          <div class="job-card-footer">
+            <span class="status-pill" [class.open]="j.status !== 'Filled'" [class.closed]="j.status === 'Filled'">
+              {{ j.status === 'Filled' ? 'CLOSED' : 'ACTIVE' }}
+            </span>
+            <span class="location-tag"><i class="fas fa-map-marker-alt"></i> {{ j.location }}</span>
+          </div>
+          <div class="active-check success" *ngIf="j.status === 'Filled'">
+            <i class="fas fa-check-circle"></i>
+          </div>
+          <div class="active-check" *ngIf="jobId && j.id == jobId && j.status !== 'Filled'">
+            <i class="fas fa-check-circle"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  }
+</div>

@@ -1,0 +1,203 @@
+<div class="job-details-page-container">
+  <!-- 1. Loading State: Only shown when strictly loading -->
+  <div *ngIf="loading" class="skeleton-wrapper fade-in-up" style="padding: 24px;">
+    <div class="skeleton-box skeleton-hero"></div>
+    <div class="skeleton-kpis">
+      <div class="skeleton-box skeleton-kpi"></div>
+      <div class="skeleton-box skeleton-kpi"></div>
+      <div class="skeleton-box skeleton-kpi"></div>
+      <div class="skeleton-box skeleton-kpi"></div>
+    </div>
+    <div class="skeleton-grid">
+      <div class="skeleton-box skeleton-panel"></div>
+      <div class="skeleton-box skeleton-panel"></div>
+    </div>
+  </div>
+
+  <!-- 2. Error State: Shown when loading is finished but job is missing -->
+  <div *ngIf="!loading && (!job || error)" class="error-container fade-in">
+    <div class="error-card glass-panel">
+      <div class="error-icon">
+        <i class="fas fa-exclamation-triangle"></i>
+      </div>
+      <h2>Hiring Request Not Found</h2>
+      <p>{{ error || 'We couldn\'t locate the details for this specific request. It may have been removed or moved.' }}</p>
+      <div class="error-actions">
+        <a routerLink="/employer/jobs" class="btn-premium secondary">
+          <i class="fas fa-arrow-left"></i> All Requests
+        </a>
+        <button (click)="ngOnInit()" class="btn-premium primary">
+          <i class="fas fa-sync"></i> Retry Now
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Content State: Shown only when job data is ready -->
+  <div class="job-details-page" *ngIf="!loading && job">
+    <header class="exec-hero fade-in-up">
+      <div class="exec-copy">
+        <div class="hero-nav">
+          <a routerLink="/employer/jobs" class="back-link">
+            <i class="fas fa-chevron-left"></i> Back to hiring requests
+          </a>
+          <span class="badge-premium">Ref: {{ job.id.slice(-6) }}</span>
+        </div>
+        <h1>{{ job.title }} <span class="text-gradient">Review</span></h1>
+        <p class="hero-desc">
+          Review the full hiring brief, track recruitment progress, and manage shortlisted candidates and interview activity from one page.
+        </p>
+
+        <div class="exec-actions">
+          <button [routerLink]="reviewCandidatesLink" class="btn-premium primary">
+            <i class="fas fa-user-check"></i> Review Candidates
+          </button>
+          <button routerLink="/employer/jobs/new" class="btn-premium secondary">
+            <i class="fas fa-plus"></i> Submit Another
+          </button>
+        </div>
+      </div>
+
+      <div class="exec-visual">
+        <div class="health-orb-container">
+          <div class="health-orb">
+            <svg viewBox="0 0 36 36" class="circular-chart" [class.blue]="progressPercent < 100" [class.green]="progressPercent === 100">
+              <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+              <path class="circle" [attr.stroke-dasharray]="progressPercent + ', 100'" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+              <text x="18" y="20.35" class="percentage">{{ progressPercent }}%</text>
+            </svg>
+          </div>
+          <div class="health-label">
+            <strong>Hiring Progress</strong>
+            <small>{{ hiredCandidatesCount }} of {{ job.openRoles }} filled</small>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <section class="premium-kpis fade-in-up delay-1">
+      <article class="kpi-glass-card">
+        <div class="icon-wrapper blue"><i class="fas fa-info-circle"></i></div>
+        <div class="kpi-data">
+          <h3>{{ statusSummary }}</h3>
+          <p>Status</p>
+        </div>
+      </article>
+
+      <article class="kpi-glass-card">
+        <div class="icon-wrapper violet"><i class="fas fa-users"></i></div>
+        <div class="kpi-data">
+          <h3>{{ job.openRoles }}</h3>
+          <p>Headcount</p>
+        </div>
+      </article>
+
+      <article class="kpi-glass-card">
+        <div class="icon-wrapper green"><i class="fas fa-star"></i></div>
+        <div class="kpi-data">
+          <h3>{{ averageFitScore }}%</h3>
+          <p>Avg Fit</p>
+        </div>
+      </article>
+
+      <article class="kpi-glass-card">
+        <div class="icon-wrapper slate"><i class="fas fa-calendar-day"></i></div>
+        <div class="kpi-data">
+          <h3>{{ job.deadline | date:'MMM d' }}</h3>
+          <p>Deadline</p>
+        </div>
+      </article>
+    </section>
+
+    <div class="premium-grid fade-in-up delay-2">
+      <div class="main-column">
+        <section class="glass-panel">
+          <header class="panel-header">
+            <h2><i class="fas fa-file-invoice"></i> Role Specification</h2>
+          </header>
+          <div class="spec-grid">
+            <div class="spec-item"><span>Department</span><strong>{{ job.department || job.category }}</strong></div>
+            <div class="spec-item"><span>Location</span><strong>{{ job.location }}</strong></div>
+            <div class="spec-item"><span>Budget</span><strong>{{ job.salary | currency:'EGP ':'symbol':'1.0-0' }}</strong></div>
+            <div class="spec-item"><span>Work Type</span><strong>{{ job.type }}</strong></div>
+            <div class="spec-item"><span>Experience</span><strong>{{ job.experienceLevel }}</strong></div>
+            <div class="spec-item"><span>Priority</span><strong [class.high-priority]="job.priority === 'high'">{{ job.priority | titlecase }}</strong></div>
+          </div>
+          <div class="content-divider"></div>
+          <div class="description-section">
+            <h3>Full Description</h3>
+            <p>{{ job.description }}</p>
+          </div>
+          <div class="skills-section" *ngIf="job.skillsRequired.length">
+            <h3>Key Competencies</h3>
+            <div class="skills-cloud">
+              <span class="skill-tag" *ngFor="let skill of job.skillsRequired">{{ skill }}</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="glass-panel margin-top">
+          <header class="panel-header">
+            <h2><i class="fas fa-user-tie"></i> Recommended Matches</h2>
+            <a [routerLink]="reviewCandidatesLink" class="link-more">Full Review Hub <i class="fas fa-chevron-right"></i></a>
+          </header>
+          <div class="premium-table-container">
+            <table class="premium-table">
+              <thead>
+                <tr>
+                  <th>Candidate</th>
+                  <th>Fit Score</th>
+                  <th>Status</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let applicant of applicants | slice:0:5">
+                  <td>
+                    <div class="user-info-row">
+                      <div class="avatar-init">{{ applicant.candidateName.charAt(0) }}</div>
+                      <div><strong>{{ applicant.candidateName }}</strong><small>{{ applicant.experienceYears || 0 }}y exp</small></div>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="fit-score-cell">
+                      <div class="mini-bar-container"><div class="mini-bar" [style.width.%]="applicant.fitScore"></div></div>
+                      <strong>{{ applicant.fitScore || 0 }}%</strong>
+                    </div>
+                  </td>
+                  <td><span class="status-pill" [ngClass]="applicant.companyDecision || 'pending'">{{ getCompanyDecisionLabel(applicant) }}</span></td>
+                  <td><i class="fas fa-chevron-right muted-icon"></i></td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="table-empty" *ngIf="!applicants.length">
+              <p>No candidates shared for this role yet.</p>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <aside class="side-column">
+        <section class="glass-panel">
+          <header class="panel-header"><h2><i class="fas fa-bolt"></i> Activity Pulse</h2></header>
+          <div class="pulse-list">
+            <div class="pulse-item">
+              <div class="pulse-marker blue"></div>
+              <div class="pulse-content"><strong>Request Submitted</strong><p>Hiring cycle started.</p><time>{{ job.createdAt | date:'MMM d' }}</time></div>
+            </div>
+            <div class="pulse-item" *ngIf="sentCandidatesCount > 0">
+              <div class="pulse-marker green"></div>
+              <div class="pulse-content"><strong>Shortlist Shared</strong><p>{{ sentCandidatesCount }} candidates delivered.</p><time>Active</time></div>
+            </div>
+            <div class="pulse-item" *ngIf="upcomingInterviewsCount > 0">
+              <div class="pulse-marker amber"></div>
+              <div class="pulse-content"><strong>Interviews Live</strong><p>{{ upcomingInterviewsCount }} upcoming events.</p><time>Live</time></div>
+            </div>
+          </div>
+        </section>
+      </aside>
+    </div>
+  </div>
+
+  <div *ngIf="error" class="error-toast">{{ error }}</div>
+</div>

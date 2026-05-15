@@ -1,0 +1,261 @@
+@import '../candidate-page.shared.css';
+
+/* Settings Page - Component Overrides */
+
+.security-box {
+  background: white;
+  padding: 16px;
+  border-radius: 20px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.02);
+}
+
+.security-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--cb-accent);
+  font-weight: 800;
+  font-size: 0.85rem;
+}
+
+.security-status i {
+  font-size: 1.2rem;
+}
+
+.clickable-card {
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.clickable-card:hover {
+  background: #fef2f2;
+  border-color: #fee2e2;
+}
+
+.settings-action-panel {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f8fafc;
+  padding: 24px;
+  border-radius: 20px;
+  border: 1px solid #eef2f6;
+  margin-top: 10px;
+}
+
+.action-info strong {
+  display: block;
+  font-size: 1.05rem;
+  color: var(--cb-text);
+  margin-bottom: 4px;
+}
+
+.action-info p {
+  font-size: 0.85rem;
+  color: var(--cb-muted);
+  max-width: 400px;
+  margin: 0;
+}
+
+.btn-logout-large {
+  padding: 14px 28px !important;
+}
+
+.btn-brand-large {
+  background: #2563eb !important;
+  color: white !important;
+  padding: 14px 28px !important;
+  border-radius: 12px;
+  text-decoration: none;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.3s ease;
+  border: none;
+}
+
+.btn-brand-large:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(37, 99, 235, 0.2);
+}
+
+/* Desktop Grid Layout */
+@media (min-width: 1025px) {
+  .settings-grid-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    align-items: stretch;
+  }
+
+  .settings-grid-layout .cb-panel {
+    height: 100%;
+    margin-bottom: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .settings-action-panel {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 24px;
+    flex: 1;
+    justify-content: space-between;
+  }
+
+  .action-info p {
+    max-width: 100%;
+  }
+}
+
+/* ── Dark Mode Overrides ── */
+:host-context(body.dark) .security-box {
+  background: #162032;
+  border-color: #243352;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+:host-context(body.dark) .security-status {
+  color: #34d399;
+}
+
+:host-context(body.dark) .cb-panel {
+  background: #111827;
+  border-color: #243352;
+}
+
+:host-context(body.dark) .cb-panel-head h3 {
+  color: #e2e8f0;
+}
+
+:host-context(body.dark) .settings-action-panel {
+  background: #0f172a;
+  border-color: #1e2d4a;
+}
+
+:host-context(body.dark) .action-info strong {
+  color: #e2e8f0;
+}
+
+:host-context(body.dark) .action-info p {
+  color: #8b9ab8;
+}
+
+:host-context(body.dark) .clickable-card:hover {
+  background: rgba(248, 113, 113, 0.08);
+  border-color: rgba(248, 113, 113, 0.2);
+}
+
+:host-context(body.dark) .btn-logout-large,
+:host-context(body.dark) .cb-btn-danger {
+  background: rgba(239, 68, 68, 0.1) !important;
+  color: #f87171 !important;
+  border: 1px solid rgba(239, 68, 68, 0.2) !important;
+}
+
+:host-context(body.dark) .cb-kpi {
+  background: #162032;
+  border-color: #243352;
+}
+
+:host-context(body.dark) .kpi-icon.blue { background: rgba(59, 130, 246, 0.15); color: #60a5fa; }
+:host-context(body.dark) .kpi-icon.green { background: rgba(16, 185, 129, 0.15); color: #34d399; }
+:host-context(body.dark) .kpi-icon.amber { background: rgba(245, 158, 11, 0.15); color: #fbbf24; }
+:host-context(body.dark) .kpi-icon.red { background: rgba(239, 68, 68, 0.15); color: #f87171; }
+
+:host-context(body.dark) .kpi-data h3 {
+  color: #fff;
+}
+
+:host-context(body.dark) .kpi-data p {
+  color: #8b9ab8;
+}
+
+@media (max-width: 768px) {
+  .settings-action-panel {
+    flex-direction: column;
+    text-align: center;
+    gap: 20px;
+  }
+
+  :host-context(.employer-shell) .candidate-page {
+    display: grid;
+    gap: 16px;
+    padding: 12px 0 18px !important;
+  }
+
+  :host-context(.employer-shell) .cb-hero {
+    padding: 18px 16px !important;
+    border-radius: 16px !important;
+    text-align: center;
+  }
+
+  :host-context(.employer-shell) .security-box {
+    display: none;
+  }
+
+  :host-context(.employer-shell) .cb-kpis {
+    display: grid;
+    grid-template-columns: 1fr !important;
+    gap: 12px;
+  }
+
+  :host-context(.employer-shell) .cb-kpi,
+  :host-context(.employer-shell) .cb-panel {
+    border-radius: 16px !important;
+    padding: 16px !important;
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.06);
+  }
+
+  :host-context(.employer-shell) .cb-kpi {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  :host-context(.employer-shell) .kpi-data h3 {
+    font-size: 0.98rem;
+    overflow-wrap: anywhere;
+  }
+
+  :host-context(.employer-shell) .settings-action-panel {
+    align-items: stretch;
+    text-align: left;
+    padding: 14px;
+    border-radius: 14px;
+  }
+
+  :host-context(.employer-shell) .btn-logout-large {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .settings-mobile-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 54px;
+    padding: 0 14px;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    color: var(--cb-text);
+    text-decoration: none;
+    font-weight: 800;
+    background: #f8fafc;
+  }
+
+  .settings-mobile-link span {
+    flex: 1;
+  }
+
+  .settings-mobile-link i:first-child {
+    color: #2563eb;
+  }
+
+  :host-context(body.dark) .settings-mobile-link {
+    background: #0f172a;
+    border-color: #1e2d4a;
+    color: #e2e8f0;
+  }
+}

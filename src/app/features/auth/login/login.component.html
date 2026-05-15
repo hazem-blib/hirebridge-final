@@ -1,0 +1,100 @@
+<div class="auth-shell">
+
+
+  <section class="brand-header">
+    <div class="brand-mark" (click)="onBrandMarkClick()">HB</div>
+    <h1>HireBridge</h1>
+    <p>Enterprise hiring and career workflows redefined</p>
+  </section>
+
+  <section class="auth-card">
+    <div class="card-header">
+      <div class="header-with-toggle">
+        <h2>Welcome back</h2>
+        <button class="icon-btn theme-toggle-btn premium-toggle" (click)="toggleDarkMode()" [title]="isDark() ? 'Switch to Light Mode' : 'Switch to Dark Mode'">
+          <div class="toggle-glow"></div>
+          <i class="fas" [class.fa-moon]="!isDark()" [class.fa-sun]="isDark()"></i>
+        </button>
+      </div>
+      <p>Please enter your workspace credentials</p>
+    </div>
+
+    <form (ngSubmit)="submit()" class="form">
+      <div class="field-header">
+        <label for="login-email">Email</label>
+      </div>
+      <div class="field with-icon">
+        <input
+          id="login-email"
+          type="email"
+          [(ngModel)]="email"
+          name="email"
+          placeholder="name@example.com"
+          (blur)="onBlur('email')"
+          (ngModelChange)="clearError()"
+          [class.invalid-input]="touched['email'] && isEmpty(email)"
+        />
+        <i class="fas fa-envelope"></i>
+      </div>
+      <div class="error" *ngIf="touched['email'] && isEmpty(email)">Email is required</div>
+
+      <div class="field-row">
+        <label for="login-password">Password</label>
+        <a routerLink="/forgot-password">Forgot Password?</a>
+      </div>
+      <div class="field with-icon">
+        <input
+          id="login-password"
+          type="password"
+          [(ngModel)]="password"
+          name="password"
+          placeholder="........"
+          (blur)="onBlur('password')"
+          (ngModelChange)="clearError()"
+          [class.invalid-input]="touched['password'] && isEmpty(password)"
+        />
+        <i class="fas fa-lock"></i>
+      </div>
+      <div class="error" *ngIf="touched['password'] && isEmpty(password)">Password is required</div>
+
+      <label class="check-row">
+        <input type="checkbox" />
+        <span>Stay signed in for 30 days</span>
+      </label>
+
+      <div class="error-alert shake" *ngIf="errorMsg">
+        <div class="alert-icon">
+          <i class="fas fa-exclamation-circle"></i>
+        </div>
+        <div class="alert-content">
+          <p>{{ errorMsg }}</p>
+        </div>
+        <button class="alert-close" (click)="errorMsg = ''; cdr.markForCheck()" type="button">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <button type="submit" class="primary-btn" [disabled]="loading">
+        <span *ngIf="!loading">Log In <i class="fas fa-arrow-right"></i></span>
+        <span *ngIf="loading" class="loading-content">
+          <i class="fas fa-circle-notch fa-spin"></i> Logging in...
+        </span>
+      </button>
+    </form>
+  </section>
+
+  <div class="auth-link-row">
+    <span>New to HireBridge?</span>
+    <a routerLink="/signup">Sign up for a new account</a>
+  </div>
+
+  <footer class="page-footer">
+    <span>&copy; 2026 HireBridge. All rights reserved.</span>
+    <nav>
+      <a href="#">Privacy Policy</a>
+      <a href="#">Terms of Service</a>
+      <a href="#">Security</a>
+      <a href="#">Contact Support</a>
+    </nav>
+  </footer>
+</div>

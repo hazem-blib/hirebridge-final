@@ -1,0 +1,151 @@
+<div class="auth-shell">
+  <section class="brand-header">
+    <div class="brand-mark">HB</div>
+    <h1>HireBridge</h1>
+    <p>Enterprise hiring and career workflows redefined</p>
+  </section>
+
+  <section class="auth-card wide-card">
+    <div class="card-header" *ngIf="!success">
+      <h2>Candidate setup</h2>
+      <p>Complete your profile to unlock better role recommendations</p>
+    </div>
+
+    <div *ngIf="success" class="success-box">
+      <div class="success-icon"><i class="fas fa-check"></i></div>
+      <h2>Profile completed</h2>
+      <p>You are ready to start applying.</p>
+    </div>
+
+    <form *ngIf="!success" (ngSubmit)="submit()" class="form-grid-premium">
+      <div class="field-premium">
+        <label>Specialization</label>
+        <div class="custom-select-premium" [class.active]="openDropdown === 'specialization'" (click)="toggleDropdown('specialization', $event)">
+          <div class="selected-value">
+            <i [class]="getDepartmentIcon(candidate.specialization)"></i>
+            <span>{{ candidate.specialization || 'Select Specialization' }}</span>
+            <i class="fas fa-chevron-down arrow"></i>
+          </div>
+          <div class="dropdown-options-premium">
+            <div class="option-item" *ngFor="let dep of departments" 
+                 [class.selected]="candidate.specialization === dep"
+                 (click)="$event.stopPropagation(); selectOption('specialization', dep)">
+              <i [class]="getDepartmentIcon(dep)"></i>
+              {{ dep }}
+            </div>
+          </div>
+        </div>
+        <div class="error" *ngIf="submitted && isEmpty(candidate.specialization)">Specialization is required</div>
+      </div>
+
+      <div class="field-premium">
+        <label>Experience Level</label>
+        <div class="custom-select-premium" [class.active]="openDropdown === 'experienceLevel'" (click)="toggleDropdown('experienceLevel', $event)">
+          <div class="selected-value">
+            <i [class]="getExperienceIcon(candidate.experienceLevel)"></i>
+            <span>{{ candidate.experienceLevel || 'Select Experience' }}</span>
+            <i class="fas fa-chevron-down arrow"></i>
+          </div>
+          <div class="dropdown-options-premium">
+            <div class="option-item" *ngFor="let level of experienceLevels" 
+                 [class.selected]="candidate.experienceLevel === level"
+                 (click)="$event.stopPropagation(); selectOption('experienceLevel', level)">
+              <i [class]="getExperienceIcon(level)"></i>
+              {{ level }}
+            </div>
+          </div>
+        </div>
+        <div class="error" *ngIf="submitted && isEmpty(candidate.experienceLevel)">Experience level is required</div>
+      </div>
+
+      <div class="field-premium">
+        <label>Min Expected Salary</label>
+        <div class="input-wrap">
+          <input type="number" [(ngModel)]="candidate.minSalary" name="minSalary" placeholder="e.g. 5000" />
+          <i class="fas fa-wallet"></i>
+        </div>
+        <div class="error" *ngIf="submitted && isEmpty(candidate.minSalary)">Minimum salary is required</div>
+      </div>
+
+      <div class="field-premium">
+        <label>Max Expected Salary</label>
+        <div class="input-wrap">
+          <input type="number" [(ngModel)]="candidate.maxSalary" name="maxSalary" placeholder="e.g. 10000" />
+          <i class="fas fa-wallet"></i>
+        </div>
+        <div class="error" *ngIf="submitted && isEmpty(candidate.maxSalary)">Maximum salary is required</div>
+      </div>
+
+      <div class="field-premium full">
+        <label>Work Type</label>
+        <div class="custom-select-premium" [class.active]="openDropdown === 'workType'" (click)="toggleDropdown('workType', $event)">
+          <div class="selected-value">
+            <i [class]="getWorkTypeIcon(candidate.workType)"></i>
+            <span>{{ formatEnum(candidate.workType) || 'Select Work Type' }}</span>
+            <i class="fas fa-chevron-down arrow"></i>
+          </div>
+          <div class="dropdown-options-premium">
+            <div class="option-item" *ngFor="let type of workTypes" 
+                 [class.selected]="candidate.workType === type"
+                 (click)="$event.stopPropagation(); selectOption('workType', type)">
+              <i [class]="getWorkTypeIcon(type)"></i>
+              {{ formatEnum(type) }}
+            </div>
+          </div>
+        </div>
+        <div class="error" *ngIf="submitted && isEmpty(candidate.workType)">Work type is required</div>
+      </div>
+
+      <div class="field-premium full">
+        <label>Skills</label>
+        <div class="skills-input-row-premium">
+          <div class="input-wrap" style="flex: 1;">
+            <input type="text" [(ngModel)]="skillInput" name="skillInput" 
+                   (keyup.enter)="addSkill($event)" 
+                   placeholder="Add skill and press Enter" />
+            <i class="fas fa-pencil"></i>
+          </div>
+          <button type="button" class="btn-add-skill-premium" (click)="addSkill($event)">
+            <i class="fas fa-plus"></i>
+          </button>
+        </div>
+
+        <div class="skills-tags-premium">
+          <div class="skill-pill-premium" *ngFor="let skill of skills; let i = index">
+            {{ skill }}
+            <i class="fas fa-times" (click)="removeSkill(i)"></i>
+          </div>
+        </div>
+        <div class="error" *ngIf="submitted && skills.length === 0">Add at least one skill</div>
+      </div>
+
+      <div class="field-premium full">
+        <div class="error-alert shake" *ngIf="errorMessage">
+          <div class="alert-icon"><i class="fas fa-circle-exclamation"></i></div>
+          <div class="alert-content">
+            <p>{{ errorMessage }}</p>
+          </div>
+        </div>
+        <button type="submit" class="btn-premium lg full-width" [disabled]="loading || success" [class.btn-success]="success">
+          <span *ngIf="!loading && !success">Save Profile <i class="fas fa-arrow-right"></i></span>
+          <span *ngIf="loading && !success" class="loading-content">
+            <i class="fas fa-circle-notch fa-spin"></i> Saving...
+          </span>
+          <span *ngIf="success" class="loading-content">
+            <i class="fas fa-check-circle"></i> Profile Saved!
+          </span>
+        </button>
+      </div>
+    </form>
+  </section>
+
+  <footer class="page-footer">
+    <span>© 2026 HireBridge. All rights reserved.</span>
+    <nav>
+      <a href="#">Privacy Policy</a>
+      <a href="#">Terms of Service</a>
+      <a href="#">Security</a>
+      <a href="#">Contact Support</a>
+    </nav>
+  </footer>
+</div>

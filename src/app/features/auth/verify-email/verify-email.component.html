@@ -1,0 +1,83 @@
+<div class="auth-shell">
+  <section class="brand-header">
+    <div class="brand-mark">HB</div>
+    <h1>HireBridge</h1>
+    <p>Enterprise hiring and career workflows redefined</p>
+  </section>
+
+  <section class="auth-card otp-card" [class.success-pulse]="successMessage">
+    <div class="error-alert shake" *ngIf="errorMessage">
+      <div class="alert-icon"><i class="fas fa-circle-exclamation"></i></div>
+      <div class="alert-content">
+        <p>{{ errorMessage }}</p>
+      </div>
+      <button class="alert-close" (click)="clearError()"><i class="fas fa-times"></i></button>
+    </div>
+
+    <div class="success-alert" *ngIf="successMessage">
+      <div class="alert-icon"><i class="fas fa-circle-check"></i></div>
+      <div class="alert-content">
+        <p>{{ successMessage }}</p>
+      </div>
+      <button class="alert-close" (click)="clearError()"><i class="fas fa-times"></i></button>
+    </div>
+
+    <form (ngSubmit)="verify()" class="form">
+      <div class="field-block">
+        <label for="verify-email">Email Address</label>
+        <div class="field with-icon readonly-field">
+          <input
+            id="verify-email"
+            type="email"
+            [(ngModel)]="email"
+            name="email"
+            readonly
+            placeholder="name@company.com"
+          />
+          <i class="fas fa-envelope"></i>
+        </div>
+      </div>
+
+      <div class="field-block">
+        <label>Verification Code</label>
+        <div class="otp-container">
+          <input type="tel" inputmode="numeric" pattern="[0-9]*" maxlength="1" (input)="handleInput($event,0)" (keydown)="handleKeyDown($event,0)" />
+          <input type="tel" inputmode="numeric" pattern="[0-9]*" maxlength="1" (input)="handleInput($event,1)" (keydown)="handleKeyDown($event,1)" />
+          <input type="tel" inputmode="numeric" pattern="[0-9]*" maxlength="1" (input)="handleInput($event,2)" (keydown)="handleKeyDown($event,2)" />
+          <input type="tel" inputmode="numeric" pattern="[0-9]*" maxlength="1" (input)="handleInput($event,3)" (keydown)="handleKeyDown($event,3)" />
+          <input type="tel" inputmode="numeric" pattern="[0-9]*" maxlength="1" (input)="handleInput($event,4)" (keydown)="handleKeyDown($event,4)" />
+        </div>
+      </div>
+
+      <button type="submit" class="primary-btn" 
+              [disabled]="loading || otp.join('').length < 5" 
+              [class.btn-ready]="otp.join('').length === 5 && !loading && !verified"
+              [class.btn-verified]="verified">
+        <span *ngIf="!loading && !verified">Verify Email <i class="fas fa-arrow-right"></i></span>
+        <span *ngIf="loading && !verified" class="loading-content">
+          <i class="fas fa-circle-notch fa-spin"></i> Verifying...
+        </span>
+        <span *ngIf="verified" class="loading-content">
+          <i class="fas fa-check-circle"></i> Verified!
+        </span>
+      </button>
+    </form>
+
+    <div class="auth-link-row compact resend-section">
+      <span *ngIf="countdown > 0">Code expires in <strong class="timer-text">{{ countdown }}s</strong></span>
+      <button *ngIf="countdown === 0" (click)="resendOtp()" class="resend-btn" [disabled]="loading">
+        Didn't receive a code? <span class="highlight">Resend Now</span>
+      </button>
+    </div>
+  </section>
+
+  <footer class="page-footer">
+    <span>© 2026 HireBridge. All rights reserved.</span>
+    <nav>
+      <a href="#">Privacy Policy</a>
+      <a href="#">Terms of Service</a>
+      <a href="#">Security</a>
+      <a href="#">Contact Support</a>
+    </nav>
+  </footer>
+</div>
